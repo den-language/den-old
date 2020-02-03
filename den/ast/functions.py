@@ -1,5 +1,7 @@
 from .node import Node
 
+# Functions AST nodes
+
 class Function(Node):
     def __init__(self, name, pos_arguments, kw_arguments, block):
         self.name = name
