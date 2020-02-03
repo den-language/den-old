@@ -1,6 +1,6 @@
 # The Den Programming Language
 
-Den is a (fast and reliable) compiled programming language aimed towards scalability, simplicity, and a modern syntax.
+Den is a compiled programming language that is designe to be fast, simple, and modern.
 
 ```
 entry => {  # no arguments so we can skip the parenthesis
