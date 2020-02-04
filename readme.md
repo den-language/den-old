@@ -1,9 +1,9 @@
 # The Den Programming Language
 
-Den is a compiled programming language that is designe to be fast, simple, and modern.
+Den is a compiled programming language that is designed to be fast, simple, and modern.
 
 ```
-entry => {  # no arguments so we can skip the parenthesis
+entry => {  # No arguments so we can skip the parenthesis
     int: x;
     int: y = &x - 1;  # Create a relationship between x and y
 
@@ -14,6 +14,6 @@ entry => {  # no arguments so we can skip the parenthesis
     # Now y is 1202
 }
 
-add(int: x, int: y) => x+y;  # define add function
-mul(x, y) => x*y;  # define mul function
+int add(int: x, int: y) => x+y;  # Define add function
+int mul(int: x, int: y) => x*y;  # Define mul function
 ```
