@@ -1,9 +1,10 @@
 from sly import Parser
-from lexer import DenLexer
-import ast
+from den.lexer import DenLexer
+import den.parser.den_ast as ast
+import den.helpers.location as location
 
 # TODO: Make this work
-class DenParser:
+class DenParser(Parser):
     tokens = DenLexer.tokens
 
 
@@ -20,20 +21,47 @@ class DenParser:
 
     @_("statement")
     def block(self, p):
-        statement = ast.meta.Block([p])
+        statement = ast.meta.Block([p], p.statement.position)
         return statement
 
     @_("empty")
     def block(self, p):
-        return ast.meta.Block([])
+        return ast.meta.Block([], 0)
     
 
     # Statements
 
-    @_("function_declaration")
+    @_("function_definition")
     def statement(self, p):
-        return 
+        print(p)
+        return p
     
+
+    # Functions
+
+    @_("type_id name_id '(' ')' FAT_ARROW '{' block '}'")
+    def function_definition(self, p):
+        return ast.functions.FunctionDefinition(
+            p.type_id,
+            p.name_id,
+            ast.functions.Arguments(
+                positional=ast.functions.PositionalArguments([]),
+                keyword=ast.functions.KeywordArguments([])
+            ),
+            p.block,
+            location.Location(p.type_id.position.sline, p.type_id.position.scol),
+        )
+    
+
+    # Expressions
+
+    @_("ID")
+    def type_id(self, p):
+        return ast.primitives.Type(p.ID, location.Location(p.lineno, p.index))
+
+    @_("ID")
+    def name_id(self, p):
+        return ast.primitives.NameID(p.ID, location.Location(p.lineno, p.index))
 
     # Empty
 

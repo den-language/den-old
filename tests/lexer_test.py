@@ -26,12 +26,6 @@ def test_fat_arrow():
 
 def test_newline():
     lexer = DenLexer()
-    data = """
-
-
-
-"""
+    data = "\n\n\n\n"
     tokens = list(lexer.tokenize(data))
-    assert len(tokens) == 1
-    for token, content in zip(tokens, list(data)):
-        assert token.type == "NEWLINE"
+    assert len(tokens) == 0

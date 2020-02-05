@@ -22,6 +22,7 @@ class DenLexer(Lexer):
     FAT_ARROW = r"=>"
     
     ignore_comment = r"\#.*"
+
     # Extra action for newlines
     @_(r"\n+")
     def NEWLINE(self, t):
