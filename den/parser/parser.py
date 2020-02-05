@@ -12,7 +12,7 @@ class DenParser(Parser):
 
     @_("block")
     def program(self, p):
-        return ast.meta.Program(p)
+        return ast.meta.Program(p, p.block.position)
 
     @_("block statement")
     def block(self, p):
@@ -21,7 +21,7 @@ class DenParser(Parser):
 
     @_("statement")
     def block(self, p):
-        statement = ast.meta.Block([p], p.statement.position)
+        statement = ast.meta.Block([p], p.statement[1].position)
         return statement
 
     @_("empty")
@@ -33,7 +33,6 @@ class DenParser(Parser):
 
     @_("function_definition")
     def statement(self, p):
-        print(p)
         return p
     
 
