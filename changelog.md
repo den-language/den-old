@@ -1,0 +1,10 @@
+# 0.0.1
+
+To be released February 16, 2020.
+
+- Transpiles to go
+- Function declarations
+- Variable declarations
+- Variable assignments
+- Entry function
+- Shorthand syntax for functions

@@ -1,5 +1,8 @@
 from sly import Lexer
-from .utils import find_column
+try:
+    from utils import find_column
+except ModuleNotFoundError:
+    from den.utils import find_column
 
 class DenLexer(Lexer):
     tokens = {

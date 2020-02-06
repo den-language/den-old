@@ -1,18 +1,22 @@
 from sly import Parser
-from den.lexer import DenLexer
-import den.parser.den_ast as ast
-import den.helpers.location as location
+try:
+    from lexer import DenLexer
+    import parser.den_ast as ast
+    import helpers.location as location
+except ModuleNotFoundError:
+    from den.lexer import DenLexer
+    import den.parser.den_ast as ast
+    import den.helpers.location as location
 
 # TODO: Make this work
 class DenParser(Parser):
     tokens = DenLexer.tokens
 
-
     # Meta grammar rules
 
     @_("block")
     def program(self, p):
-        return ast.meta.Program(p, p.block.position)
+        return ast.meta.Program(p.block, p.block.position)
 
     @_("block statement")
     def block(self, p):
@@ -21,7 +25,7 @@ class DenParser(Parser):
 
     @_("statement")
     def block(self, p):
-        statement = ast.meta.Block([p], p.statement[1].position)
+        statement = ast.meta.Block([p.statement], p.statement.position)
         return statement
 
     @_("empty")
@@ -33,7 +37,7 @@ class DenParser(Parser):
 
     @_("function_definition")
     def statement(self, p):
-        return p
+        return p.function_definition
     
 
     # Functions

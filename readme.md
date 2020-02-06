@@ -17,3 +17,5 @@ entry => {  # No arguments so we can skip the parenthesis
 int add(int: x, int: y) => x+y;  # Define add function
 int mul(int: x, int: y) => x*y;  # Define mul function
 ```
+
+[Changelog](./changelog.md)

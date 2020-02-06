@@ -10,5 +10,4 @@ int add() => {
 }
 """
     result = parser.parse(lexer.tokenize(text))
-    print(result)
     assert 0
