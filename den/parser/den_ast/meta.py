@@ -9,11 +9,12 @@ class meta:
             self.block = block
             if name is None:
                 self.name = f"{uuid.uuid4()}"
-            self.name = name
+            else:
+                self.name = "_".join(name.split(".")[:-1])
             self.position = position
         
         def add_name(self, name):
-            self.name = name
+            self.name = "_".join(name.split(".")[:-1])
 
         def dump(self):
             return f"package {self.name}"
