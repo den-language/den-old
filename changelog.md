@@ -2,7 +2,7 @@
 
 To be released February 16, 2020.
 
-- Transpiles to go
+- Transpiles to LLVM IR?
 - Function declarations
 - Variable declarations
 - Variable assignments
