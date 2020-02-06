@@ -12,10 +12,16 @@ class CodeGen:
         self.builder = None
 
     def traverse(self, node):
-        print(node)
         if isinstance(node, ast.meta.Program):
             self.builder.push("FRONT", node.dump())
+            self.traverse(node.block)
         
+        elif isinstance(node, ast.meta.Block):
+            for statement in node.statements:
+                self.traverse(statement)
+        
+        elif isinstance(node, ast.functions.FunctionDefinition):
+            self.builder.push("FUNCTIONS", node.dump())
     
     def generate(self, ast):
         self.ast = ast

@@ -12,7 +12,7 @@ class functions:
         
         # TODO: Get this done
         def dump(self):
-            pass
+            return "Test()"
 
     class Arguments:
         def __init__(self, positional=None, keyword=None):
