@@ -11,20 +11,23 @@ class DenLexer(Lexer):
         NEWLINE,
         ID,
         FAT_ARROW,
-        RET
+        RET,
+        STRING
     }
 
     ignore = " \t"
 
     literals = { "{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";", "%"}
 
-    # Tokens
+    # Tokens'
+    STRING = r"(\".*?(?<!\\)(\\\\)*\"|'.*?(?<!\\)(\\\\)*')"  # String (yes that many backslashes for escape)
+
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
     ID["ret"] = RET
 
     INT = r"\d+"
     FAT_ARROW = r"=>"
-    
+
     ignore_comment = r"\#.*"
 
     # Extra action for newlines

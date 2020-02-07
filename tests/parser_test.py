@@ -19,6 +19,7 @@ def test_parser_2():
     text = """
 int add() => {
     int: x = -10+10*10-(20%213)-10/10;
+    int: y = x;
 }
 """
     result = parser.parse(lexer.tokenize(text))

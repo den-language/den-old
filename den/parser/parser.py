@@ -14,6 +14,7 @@ class DenParser(Parser):
     debugfile = "parser.out"
 
     precedence = (
+        ("left", EMPTY),
         ("left", "+", "-"),
         ("left", "*", "/", "%"),
         ("right", UMINUS),
@@ -162,7 +163,7 @@ class DenParser(Parser):
 
     # Empty
 
-    @_("")
+    @_("%prec EMPTY")
     def empty(self, p):
         pass
 
