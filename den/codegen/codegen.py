@@ -24,9 +24,12 @@ class ModuleCodeGen:
         expected to return a llvmlite.ir.Value.
         """
         method = '_codegen_' + node.__class__.__name__
-        if node.__class__.__name__ in ["Add", "Sub", "Mul", "Div", "Mod", "Neg"]:
+        if node.__class__.__name__ in ["Add", "Sub", "Mul", "Div", "Mod"]:
             return self._codegen_BinaryOp(node)
         return getattr(self, method)(node)
+
+    def _codegen_Neg(self, node):
+        return self.builder.neg(self._codegen(node.value), name="tmpneg")
 
     def _codegen_BinaryOp(self, node):
         left = self._codegen(node.left)
@@ -39,7 +42,6 @@ class ModuleCodeGen:
                 "Mul": self.builder.mul,
                 "Div": self.builder.sdiv,
                 "Mod": self.builder.srem,
-                "Neg": self.builder.neg
             },
             "float": {
                 "Add": self.builder.fadd,
@@ -88,8 +90,6 @@ class ModuleCodeGen:
         for statement in node.block.statements:
             self._codegen(statement)
 
-        # retval = self._codegen()
-        # self.builder.ret(retval)
         return func
     
     def _create_entry_block_alloca(self, name, _type):

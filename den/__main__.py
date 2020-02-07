@@ -2,7 +2,7 @@ from module import DenModule
 
 text = """
 int test1() => {
-    int: x = (1-10)*10+10;
+    int: x = -(1-10)*10+10;
     ret 10;
 }
 """
