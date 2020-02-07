@@ -12,7 +12,7 @@ class ModuleCodeGen:
         self.module = None
         self.builder = None
 
-        self.func_symtab = {}
+        self.symtab = {}
 
     def generate_code(self, node):
         for statement in node.block.statements:
@@ -24,10 +24,43 @@ class ModuleCodeGen:
         expected to return a llvmlite.ir.Value.
         """
         method = '_codegen_' + node.__class__.__name__
+        if node.__class__.__name__ in ["Add", "Sub", "Mul", "Div", "Mod", "Neg"]:
+            return self._codegen_BinaryOp(node)
         return getattr(self, method)(node)
+
+    def _codegen_BinaryOp(self, node):
+        left = self._codegen(node.left)
+        right = self._codegen(node.right)
+        
+        self.builtin_types = {
+            "i32": {
+                "Add": self.builder.add,
+                "Sub": self.builder.sub,
+                "Mul": self.builder.mul,
+                "Div": self.builder.sdiv,
+                "Mod": self.builder.srem,
+                "Neg": self.builder.neg
+            },
+            "float": {
+                "Add": self.builder.fadd,
+                "Sub": self.builder.fsub,
+                "Mul": self.builder.fmul,
+                "Div": self.builder.fdiv,
+                "Mod": self.builder.frem,
+            }
+        }
+
+        node_name = node.__class__.__name__
+
+        if str(left.type) != str(right.type):
+            raise TypeError("error")  # TODO: Do error reporting
+        elif str(left.type) in self.builtin_types and node_name in self.builtin_types[str(left.type)]:
+            return self.builtin_types[str(left.type)][node_name](left, right, f"temp{str(left.type).lower()}")
+        else:
+            raise NotImplementedError("error") # TODO: Do error reporting
     
     def _codegen_FunctionDefinition(self, node):
-        self.func_symtab = {}
+        self.symtab = {}
 
         funcname = node.name.name
 
@@ -49,9 +82,8 @@ class ModuleCodeGen:
             arg.name = node.arguments.positional_arguments.arguments[i]
             alloca = self.builder.alloca(self._codegen(node.arguments.positional_arguments.arguments[i]), name=arg.name)
             self.builder.store(arg, alloca)
-            self.func_symtab[arg.name] = alloca
+            self.symtab[arg.name] = alloca
 
-        # TODO: Get this working
         
         for statement in node.block.statements:
             self._codegen(statement)
@@ -67,8 +99,6 @@ class ModuleCodeGen:
         return builder.alloca(_type, size=None, name=name)
 
     def _codegen_VariableAssign(self, node):
-        old_bindings = []
-
         if node.value is not None:
             init_val = self._codegen(node.value)
         else:
@@ -78,8 +108,7 @@ class ModuleCodeGen:
         self.builder.position_at_end(saved_block)
         self.builder.store(init_val, var_addr)
 
-        old_bindings.append(self.func_symtab.get(node.id.name))
-        self.func_symtab[node.id.name] = var_addr
+        self.symtab[node.id.name] = var_addr
     
     def _codegen_Return(self, node):
         retval = self._codegen(node.value)

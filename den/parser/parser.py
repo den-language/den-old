@@ -13,6 +13,11 @@ class DenParser(Parser):
     tokens = DenLexer.tokens
     debugfile = "parser.out"
 
+    precedence = (
+        ("left", "+", "-"),
+        ("left", "*", "/", "%"),
+        ("right", UMINUS),
+    )
 
     # Meta grammar rules
 
@@ -109,6 +114,37 @@ class DenParser(Parser):
     @_("INT")
     def integer(self, p):
         return ast.primitives.Integer(p.INT, location.Location(p.lineno, p.index))
+
+
+    # Maths with expressions
+
+    @_("'-' expr %prec UMINUS")
+    def expr(self, p):
+        return ast.maths.Neg(p.expr, location.Location(p.expr.position.sline, p.expr.position.scol))
+
+    @_("expr '+' expr")
+    def expr(self, p):
+        return ast.maths.Add(p.expr0, p.expr1, location.Location(p.expr0.position.sline, p.expr0.position.scol))
+
+    @_("expr '-' expr")
+    def expr(self, p):
+        return ast.maths.Sub(p.expr0, p.expr1, location.Location(p.expr0.position.sline, p.expr0.position.scol))
+
+    @_("expr '/' expr")
+    def expr(self, p):
+        return ast.maths.Div(p.expr0, p.expr1, location.Location(p.expr0.position.sline, p.expr0.position.scol))
+
+    @_("expr '*' expr")
+    def expr(self, p):
+        return ast.maths.Mul(p.expr0, p.expr1, location.Location(p.expr0.position.sline, p.expr0.position.scol))
+
+    @_("expr '%' expr")
+    def expr(self, p):
+        return ast.maths.Mod(p.expr0, p.expr1, location.Location(p.expr0.position.sline, p.expr0.position.scol))
+    
+    @_("'(' expr ')'")
+    def expr(self, p):
+        return p.expr
 
     # IDs
 

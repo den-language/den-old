@@ -31,3 +31,8 @@ class maths:
             self.left = left
             self.right = right
             self.position = position
+    
+    class Neg(Node):
+        def __init__(self, value, position):
+            self.value = value
+            self.position = position
