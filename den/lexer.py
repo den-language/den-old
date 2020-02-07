@@ -11,6 +11,7 @@ class DenLexer(Lexer):
         NEWLINE,
         ID,
         FAT_ARROW,
+        RET
     }
 
     ignore = " \t"
@@ -19,7 +20,7 @@ class DenLexer(Lexer):
 
     # Tokens
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
-    # ID["func"] = FUNC
+    ID["ret"] = RET
 
     INT = r"\d+"
     FAT_ARROW = r"=>"
@@ -32,7 +33,7 @@ class DenLexer(Lexer):
         self.lineno += t.value.count("\n")
 
     def error(self, t):
-        print(f"Illegal character `{t.value[0]}` at line {self.lineno} col {find_column(self.text, t)}")
+        print(f"Illegal character `{t.value[0]}` at line {self.lineno} col {find_column(self.text, t.index)}")
         self.index += 1
 
 if __name__ == "__main__":

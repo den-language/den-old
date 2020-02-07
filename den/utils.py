@@ -1,6 +1,6 @@
-def find_column(text, token):
-    last_cr = text.rfind("\n", 0, token.index)
+def find_column(text, index):
+    last_cr = text.rfind("\n", 0, index)
     if last_cr < 0:
         last_cr = 0
-    column = (token.index - last_cr) + 1
+    column = (index - last_cr) + 1
     return column

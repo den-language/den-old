@@ -9,6 +9,11 @@ class functions:
             self.name = name
             self.arguments = arguments
             self.block = block
+    
+    class Return(Node):
+        def __init__(self, value, position):
+            self.value = value
+            self.position = position
 
     class Arguments:
         def __init__(self, positional=None, keyword=None):

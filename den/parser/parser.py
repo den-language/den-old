@@ -11,6 +11,8 @@ except ModuleNotFoundError:
 # TODO: Make this work
 class DenParser(Parser):
     tokens = DenLexer.tokens
+    debugfile = "parser.out"
+
 
     # Meta grammar rules
 
@@ -39,6 +41,14 @@ class DenParser(Parser):
     def statement(self, p):
         return p.function_definition
     
+    @_("variable_assign")
+    def statement(self, p):
+        return p.variable_assign
+    
+    @_("ret")
+    def statement(self, p):
+        return p.ret
+    
 
     # Functions
 
@@ -56,8 +66,51 @@ class DenParser(Parser):
             location.Location(p.type_id.position.sline, p.type_id.position.scol),
         )
     
+    @_("RET expr ';'")
+    def ret(self, p):
+        return ast.functions.Return(
+            p.expr, 
+            location.Location(
+                p.lineno, 
+                p.index, 
+                eline=p.expr.position.sline, 
+                ecol=p.expr.position.ecol
+            )
+        )
+    
+
+    # Variables
+
+    @_("type_id ':' name_id '=' expr ';'")
+    def variable_assign(self, p):
+        return ast.variables.VariableAssign(
+            p.type_id, 
+            p.name_id, 
+            p.expr, 
+            location.Location(
+                p.type_id.position.sline, 
+                p.type_id.position.scol, 
+                eline=p.expr.position.sline, 
+                ecol=p.expr.position.ecol
+            )
+        )
+
 
     # Expressions
+
+    @_("ref_id")
+    def expr(self, p):
+        return p.ref_id
+    
+    @_("integer")
+    def expr(self, p):
+        return p.integer
+
+    @_("INT")
+    def integer(self, p):
+        return ast.primitives.Integer(p.INT, location.Location(p.lineno, p.index))
+
+    # IDs
 
     @_("ID")
     def type_id(self, p):
@@ -66,6 +119,10 @@ class DenParser(Parser):
     @_("ID")
     def name_id(self, p):
         return ast.primitives.NameID(p.ID, location.Location(p.lineno, p.index))
+    
+    @_("ID")
+    def ref_id(self, p):
+        return ast.primitives.RefID(p.ID, location.Location(p.lineno, p.index))
 
     # Empty
 

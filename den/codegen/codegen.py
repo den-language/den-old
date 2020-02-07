@@ -37,9 +37,8 @@ class ModuleCodeGen:
         )
 
         if funcname in self.module.globals:
-            existing_func = self.module[funcname]
-            print(f"WARNING: redefinition of {funcname}")
-            func = self.module.globals[funcname]
+            # TODO get error reporting working
+            raise NameError(f"ERROR: redefinition of {funcname}")
         else:
             func = ir.Function(self.module, func_ty, funcname)
         
@@ -53,14 +52,45 @@ class ModuleCodeGen:
             self.func_symtab[arg.name] = alloca
 
         # TODO: Get this working
+        
+        for statement in node.block.statements:
+            self._codegen(statement)
+
         # retval = self._codegen()
         # self.builder.ret(retval)
         return func
     
+    def _create_entry_block_alloca(self, name, _type):
+        """Create an alloca in the entry BB of the current function."""
+        builder = ir.IRBuilder()
+        builder.position_at_start(self.builder.function.entry_basic_block)
+        return builder.alloca(_type, size=None, name=name)
+
+    def _codegen_VariableAssign(self, node):
+        old_bindings = []
+
+        if node.value is not None:
+            init_val = self._codegen(node.value)
+        else:
+            pass # init_val = ir.Constant(ir.DoubleType(), 0.0)
+        saved_block = self.builder.block
+        var_addr = self._create_entry_block_alloca(node.id.name, init_val.type)
+        self.builder.position_at_end(saved_block)
+        self.builder.store(init_val, var_addr)
+
+        old_bindings.append(self.func_symtab.get(node.id.name))
+        self.func_symtab[node.id.name] = var_addr
+    
+    def _codegen_Return(self, node):
+        retval = self._codegen(node.value)
+        self.builder.ret(retval)
+
     def _codegen_Type(self, node):
         if node.name == "int":
             return ir.IntType(32)
-
+        
+    def _codegen_Integer(self, node):
+        return ir.Constant(ir.IntType(32), int(node.value))
     
     def generate(self, _ast):
         assert isinstance(_ast, ast.meta.Program)
