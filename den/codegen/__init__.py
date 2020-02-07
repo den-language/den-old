@@ -1,1 +1,1 @@
-from .codegen import CodeGen
+from .codegen import ModuleCodeGen

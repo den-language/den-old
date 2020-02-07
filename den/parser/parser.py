@@ -44,6 +44,7 @@ class DenParser(Parser):
 
     @_("type_id name_id '(' ')' FAT_ARROW '{' block '}'")
     def function_definition(self, p):
+        p.block.label = "entry"
         return ast.functions.FunctionDefinition(
             p.type_id,
             p.name_id,

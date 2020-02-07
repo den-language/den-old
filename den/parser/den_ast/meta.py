@@ -1,6 +1,7 @@
 from .node import Node
 import uuid
 
+
 # Meta code sections
 
 class meta:
@@ -16,13 +17,11 @@ class meta:
         def add_name(self, name):
             self.name = "_".join(name.split(".")[:-1])
 
-        def dump(self):
-            return f"package {self.name}"
-
     class Block(Node):
         def __init__(self, statements, position):
             self.statements = statements
             self.position = position
+            self.label = None  # e.g. entry
 
         def push(self, statement):
             self.statements.append(statement)
