@@ -10,4 +10,17 @@ int add() => {
 }
 """
     result = parser.parse(lexer.tokenize(text))
-    assert 0
+    assert result.block.statements[0].return_type.name == "int"
+    assert result.block.statements[0].name.name == "add"
+
+def test_parser_2():
+    lexer = DenLexer()
+    parser = DenParser()
+    text = """
+int add() => {
+    int: x = -10+10*10-(20%213)-10/10;
+}
+"""
+    result = parser.parse(lexer.tokenize(text))
+    assert result.block.statements[0].return_type.name == "int"
+    assert result.block.statements[0].name.name == "add"

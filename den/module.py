@@ -1,6 +1,11 @@
-from parser import DenParser
-from lexer import DenLexer
-from codegen import ModuleCodeGen
+try:
+    from parser import DenParser
+    from lexer import DenLexer
+    from codegen import ModuleCodeGen
+except ImportError:
+    from den.parser import DenParser
+    from den.lexer import DenLexer
+    from den.codegen import ModuleCodeGen 
 
 class DenModule:
     def __init__(self, filename, text=""):

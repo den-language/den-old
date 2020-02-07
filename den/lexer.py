@@ -16,7 +16,7 @@ class DenLexer(Lexer):
 
     ignore = " \t"
 
-    literals = { "{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";"}
+    literals = { "{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";", "%"}
 
     # Tokens
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
@@ -35,6 +35,7 @@ class DenLexer(Lexer):
     def error(self, t):
         print(f"Illegal character `{t.value[0]}` at line {self.lineno} col {find_column(self.text, t.index)}")
         self.index += 1
+        raise SyntaxError
 
 if __name__ == "__main__":
     file = """entry => {  # no arguments so we can skip the parenthesis
