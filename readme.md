@@ -1,5 +1,7 @@
 # The Den Programming Language
 
+![CI status](https://img.shields.io/github/workflow/status/MonliH/den/Quality?style=for-the-badge)
+
 Den is a compiled programming language that is designed to be fast, simple, and modern.
 
 ```
