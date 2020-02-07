@@ -1,8 +1,3 @@
-try:
-    import parser.den_ast as ast
-except ImportError:
-    import den.parser.den_ast as ast
-
 from llvmlite import ir
 
 
@@ -12,6 +7,10 @@ class ModuleCodeGen:
         self.debug = debug
         self.module = None
         self.builder = None
+
+        self.result = None
+
+        self.builtin_types = {}
 
         self.symtab = {}
 
@@ -36,7 +35,7 @@ class ModuleCodeGen:
         left = self._codegen(node.left)
         right = self._codegen(node.right)
 
-        self.builtin_types = {
+        self.builtin_types = {  # skipcq
             "i32": {
                 "Add": self.builder.add,
                 "Sub": self.builder.sub,

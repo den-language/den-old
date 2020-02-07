@@ -9,7 +9,7 @@ except ModuleNotFoundError:
     import den.parser.den_ast as ast
     import den.helpers.location as location
 
-# TODO: Make this work
+
 class DenParser(Parser):
     tokens = DenLexer.tokens
     debugfile = "parser.out"
