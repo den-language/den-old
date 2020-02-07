@@ -1,10 +1,8 @@
 # The Den Programming Language
 
-![CI status](https://img.shields.io/github/workflow/status/MonliH/den/Quality?style=for-the-badge)
-
 Den is a compiled programming language that is designed to be fast, simple, and modern.
 
-```
+```den
 entry => {  # No arguments so we can skip the parenthesis
     int: x;
     int: y = &x - 1;  # Create a relationship between x and y
