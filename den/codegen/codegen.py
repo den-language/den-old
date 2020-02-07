@@ -1,14 +1,14 @@
 try:
     import parser.den_ast as ast
-except:
+except ImportError:
     import den.parser.den_ast as ast
 
 from llvmlite import ir
 
 
 class ModuleCodeGen:
-    def __init__(self, ast=None, debug=False):
-        self.ast = ast
+    def __init__(self, _ast=None, debug=False):
+        self.ast = _ast
         self.debug = debug
         self.module = None
         self.builder = None
@@ -125,15 +125,16 @@ class ModuleCodeGen:
         retval = self._codegen(node.value)
         self.builder.ret(retval)
 
-    def _codegen_Type(self, node):
+    @staticmethod
+    def _codegen_Type(node):
         if node.name == "int":
             return ir.IntType(32)
 
-    def _codegen_Integer(self, node):
+    @staticmethod
+    def _codegen_Integer(node):
         return ir.Constant(ir.IntType(32), int(node.value))
 
     def generate(self, _ast):
-        assert isinstance(_ast, ast.meta.Program)
         self.ast = _ast
         self.module = ir.Module(name=self.ast.name)
         self.generate_code(self.ast)

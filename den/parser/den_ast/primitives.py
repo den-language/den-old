@@ -1,5 +1,4 @@
 from .node import Node
-from llvmlite import ir
 
 
 # Primitive AST nodes

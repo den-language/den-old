@@ -13,8 +13,10 @@ class DenLexer(Lexer):
 
     literals = {"{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";", "%"}
 
-    # Tokens'
-    STRING = r"(\".*?(?<!\\)(\\\\)*\"|'.*?(?<!\\)(\\\\)*')"  # String (yes that many backslashes for escape)
+    # Tokens
+
+    # String (yes that many backslashes for escape)
+    STRING = r"(\".*?(?<!\\)(\\\\)*\"|'.*?(?<!\\)(\\\\)*')"
 
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
     ID["ret"] = RET
@@ -31,7 +33,8 @@ class DenLexer(Lexer):
 
     def error(self, t):
         print(
-            f"Illegal character `{t.value[0]}` at line {self.lineno} col {find_column(self.text, t.index)}"
+            f"Illegal character `{t.value[0]}` at line \
+                {self.lineno} col {find_column(self.text, t.index)}"
         )
         self.index += 1
         raise SyntaxError

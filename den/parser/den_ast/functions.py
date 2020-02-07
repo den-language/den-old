@@ -15,15 +15,15 @@ class functions:
             self.value = value
             self.position = position
 
-    class Arguments:
+    class Arguments(Node):
         def __init__(self, positional=None, keyword=None):
             self.positional_arguments = positional
             self.keyword_arguments = keyword
 
-    class PositionalArguments:
+    class PositionalArguments(Node):
         def __init__(self, arguments):
             self.arguments = arguments
 
-    class KeywordArguments:
+    class KeywordArguments(Node):
         def __init__(self, arguments):
             self.arguments = arguments
