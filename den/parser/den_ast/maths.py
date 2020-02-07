@@ -2,6 +2,7 @@ from .node import Node
 
 # Maths AST nodes
 
+
 class maths:
     class Add(Node):
         def __init__(self, left, right, position):
