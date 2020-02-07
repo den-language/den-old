@@ -1,5 +1,7 @@
 # The Den Programming Language
 
+[(![Codacy Badge](https://img.shields.io/codacy/grade/bdc3b36eff354ef3add854b40115ad53?style=for-the-badge)](https://www.codacy.com/manual/MonliH/den)
+
 Den is a compiled programming language that is designed to be fast, simple, and modern.
 
 ```den
