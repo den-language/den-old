@@ -1,23 +1,17 @@
 from sly import Lexer
+
 try:
     from utils import find_column
 except ModuleNotFoundError:
     from den.utils import find_column
 
+
 class DenLexer(Lexer):
-    tokens = {
-        INT,
-        COLON,
-        NEWLINE,
-        ID,
-        FAT_ARROW,
-        RET,
-        STRING
-    }
+    tokens = {INT, COLON, NEWLINE, ID, FAT_ARROW, RET, STRING}
 
     ignore = " \t"
 
-    literals = { "{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";", "%"}
+    literals = {"{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";", "%"}
 
     # Tokens'
     STRING = r"(\".*?(?<!\\)(\\\\)*\"|'.*?(?<!\\)(\\\\)*')"  # String (yes that many backslashes for escape)
@@ -36,9 +30,12 @@ class DenLexer(Lexer):
         self.lineno += t.value.count("\n")
 
     def error(self, t):
-        print(f"Illegal character `{t.value[0]}` at line {self.lineno} col {find_column(self.text, t.index)}")
+        print(
+            f"Illegal character `{t.value[0]}` at line {self.lineno} col {find_column(self.text, t.index)}"
+        )
         self.index += 1
         raise SyntaxError
+
 
 if __name__ == "__main__":
     file = """entry => {  # no arguments so we can skip the parenthesis

@@ -2,6 +2,7 @@ from .node import Node
 
 # Variable AST nodes
 
+
 class variables:
     class VariableAssign:
         def __init__(self, _type, _id, value, position):

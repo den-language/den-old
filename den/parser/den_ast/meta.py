@@ -4,6 +4,7 @@ import uuid
 
 # Meta code sections
 
+
 class meta:
     class Program(Node):
         def __init__(self, block, position, name=None):
@@ -13,7 +14,7 @@ class meta:
             else:
                 self.name = "_".join(name.split(".")[:-1])
             self.position = position
-        
+
         def add_name(self, name):
             self.name = "_".join(name.split(".")[:-1])
 

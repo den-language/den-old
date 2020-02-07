@@ -4,6 +4,7 @@ from llvmlite import ir
 
 # Primitive AST nodes
 
+
 class primitives:
     class Integer(Node):
         def __init__(self, value, position):

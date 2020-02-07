@@ -1,5 +1,6 @@
 from den.module import DenModule
 
+
 def test_module():
     text = """
     int test1() => {
@@ -13,4 +14,3 @@ def test_module():
     module.generate()
 
     print(str(module.result))
-
