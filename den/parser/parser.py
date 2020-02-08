@@ -66,7 +66,7 @@ class DenParser(Parser):
     @_("variable_assign")
     def statement(self, p):
         return p.variable_assign
-    
+
     @_("function_call ';'")
     def statement(self, p):
         return p.function_call
@@ -207,12 +207,11 @@ class DenParser(Parser):
     @_("integer")
     def expr(self, p):
         return p.integer
-    
+
     @_("function_call")
     def expr(self, p):
         return p.function_call
 
-    
     # Sub expressions
 
     @_("INT")

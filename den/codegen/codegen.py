@@ -36,7 +36,6 @@ class ModuleCodeGen:
             return self._codegen_BinaryOp(node)
         return getattr(self, method)(node)
 
-
     # Expressions
 
     def _codegen_Neg(self, node):
@@ -82,7 +81,6 @@ class ModuleCodeGen:
         else:
             raise NotImplementedError("error")  # TODO: Do error reporting
 
-    
     # Functions
 
     def _create_entry_block_alloca(self, name, _type):
@@ -133,13 +131,16 @@ class ModuleCodeGen:
         # TODO: Error reporting
         called_function = self.module.get_global(node.name.name)
         # check if function
-        call_args = [self._codegen(argument) for argument in node.arguments.positional_arguments.arguments]
-        return self.builder.call(called_function, call_args, 'calltmp')
+        call_args = [
+            self._codegen(argument)
+            for argument in node.arguments.positional_arguments.arguments
+        ]
+        return self.builder.call(called_function, call_args, "calltmp")
 
     def _codegen_Return(self, node):
         retval = self._codegen(node.value)
         self.builder.ret(retval)
-    
+
     # Variables
 
     def _codegen_VariableAssignFull(self, node):
@@ -164,7 +165,6 @@ class ModuleCodeGen:
 
         self.builder.position_at_end(saved_block)
         self.builder.store(init_val, var_addr)
-
 
     @staticmethod
     def _codegen_Type(node):

@@ -1,12 +1,16 @@
 from module import DenModule
 
 text = """
-int test1(int: z) => {
-    int: x = test2(z);
-    ret x;
+int func1(int: z) => {
+    ret z;
 }
 
-int test2(int: y) => {
+int func2(int: z) => {
+    ret z;
+}
+
+int test(int: y) => {
+    int: x = func1(func2(10));
     ret y;
 }
 """
