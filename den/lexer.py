@@ -38,4 +38,3 @@ class DenLexer(Lexer):
         )
         self.index += 1
         raise SyntaxError
-
