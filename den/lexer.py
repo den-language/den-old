@@ -39,18 +39,3 @@ class DenLexer(Lexer):
         self.index += 1
         raise SyntaxError
 
-
-if __name__ == "__main__":
-    file = """entry => {  # no arguments so we can skip the parenthesis
-    int: x;
-    int: y = &x - 1;  # Create a relationship between x and y
-
-    x = 10;
-    # Now y is 9
-
-    x = 1203;
-    # Now y is 1202
-}"""
-    lexer = DenLexer()
-    for token in lexer.tokenize(file):
-        print(token)
