@@ -1,9 +1,13 @@
 from module import DenModule
 
 text = """
-int test1() => {
-    int: x = -(1-10)*10+10;
-    ret 10;
+int test1(int: x) => {
+    ret x;
+}
+
+int test2() => {
+    int: y = -(1-10)*10+10;
+    ret y;
 }
 """
 

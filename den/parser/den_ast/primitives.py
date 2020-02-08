@@ -21,8 +21,9 @@ class primitives:
             self.position = position
 
     class NameID(Node):
-        def __init__(self, name, position):
+        def __init__(self, name, position, tp=None):
             self.name = name
+            self.type = tp
             self.position = position
 
     class RefID(Node):

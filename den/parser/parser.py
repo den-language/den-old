@@ -47,6 +47,14 @@ class DenParser(Parser):
     def statement(self, p):
         return p.function_definition
 
+    @_("variable_assign_full")
+    def statement(self, p):
+        return p.variable_assign_full
+
+    @_("variable_dec")
+    def statement(self, p):
+        return p.variable_dec
+    
     @_("variable_assign")
     def statement(self, p):
         return p.variable_assign
@@ -57,7 +65,37 @@ class DenParser(Parser):
 
     # Functions
 
-    @_("type_id name_id '(' ')' FAT_ARROW '{' block '}'")
+    @_("type_id name_id '(' id_items ')' FAT_ARROW '{' block '}'", 
+        "type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'")
+    def function_definition(self, p):
+        p.block.label = "entry"
+        return ast.functions.FunctionDefinition(
+            p.type_id,
+            p.name_id,
+            ast.functions.Arguments(
+                positional=ast.functions.PositionalArguments(p.id_items),
+            ),
+            p.block,
+            location.Location(p.type_id.position.sline, p.type_id.position.scol),
+        )
+    
+    @_("type_id name_id '(' type_id ':' name_id ')' FAT_ARROW '{' block '}'", 
+        "type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'")
+    def function_definition(self, p):
+        p.block.label = "entry"
+        p.name_id1.type = p.type_id1
+        return ast.functions.FunctionDefinition(
+            p.type_id0,
+            p.name_id0,
+            ast.functions.Arguments(
+                positional=ast.functions.PositionalArguments([p.name_id1]),
+            ),
+            p.block,
+            location.Location(p.type_id0.position.sline, p.type_id0.position.scol),
+        )
+    
+    @_("type_id name_id '(' ')' FAT_ARROW '{' block '}'",
+        "type_id name_id '(' ',' ')' FAT_ARROW '{' block '}'")
     def function_definition(self, p):
         p.block.label = "entry"
         return ast.functions.FunctionDefinition(
@@ -86,8 +124,8 @@ class DenParser(Parser):
     # Variables
 
     @_("type_id ':' name_id '=' expr ';'")
-    def variable_assign(self, p):
-        return ast.variables.VariableAssign(
+    def variable_assign_full(self, p):
+        return ast.variables.VariableAssignFull(
             p.type_id,
             p.name_id,
             p.expr,
@@ -96,6 +134,32 @@ class DenParser(Parser):
                 p.type_id.position.scol,
                 eline=p.expr.position.sline,
                 ecol=p.expr.position.ecol,
+            ),
+        )
+    
+    @_("name_id '=' expr ';'")
+    def variable_assign(self, p):
+        return ast.variables.VariableAssign(
+            p.name_id,
+            p.expr,
+            location.Location(
+                p.name_id.position.sline,
+                p.name_id.position.scol,
+                eline=p.expr.position.sline,
+                ecol=p.expr.position.ecol,
+            ),
+        )
+    
+    @_("type_id ':' name_id ';'")
+    def variable_dec(self, p):
+        return ast.variables.VariableDec(
+            p.name_id,
+            p.type_id,
+            location.Location(
+                p.type_id.position.sline,
+                p.type_id.position.scol,
+                eline=p.name_id.position.sline,
+                ecol=p.name_id.position.ecol,
             ),
         )
 
@@ -112,6 +176,29 @@ class DenParser(Parser):
     @_("INT")
     def integer(self, p):
         return ast.primitives.Integer(p.INT, location.Location(p.lineno, p.index))
+
+
+    # Sub expressions
+    @_("expr ',' expr")
+    def items(self, p):
+        return [p.expr0, p.expr1]
+
+    @_("items ',' expr")
+    def items(self, p):
+        return [p.items] + [p.expr0]
+    
+
+    @_("type_id ':' name_id ',' type_id ':' name_id")
+    def id_items(self, p):
+        p.name_id0.type = p.type_id0
+        p.name_id1.type = p.type_id1
+        return [p.name_id0, p.name_id1]
+    
+    @_("id_items ',' type_id ':' name_id")
+    def id_items(self, p):
+        p.name_id.type = p.type_id
+        return [p.id_items] + [p.name_id]
+
 
     # Maths with expressions
 

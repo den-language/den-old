@@ -31,6 +31,11 @@ class ModuleCodeGen:
     def _codegen_Neg(self, node):
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
 
+    def _codegen_RefID(self, node):
+        # TODO: Do error reporting
+        variable = self.symtab[node.name]
+        return self.builder.load(variable, node.name)
+
     def _codegen_BinaryOp(self, node):
         left = self._codegen(node.left)
         right = self._codegen(node.right)
@@ -70,11 +75,10 @@ class ModuleCodeGen:
         self.symtab = {}
 
         funcname = node.name.name
-
         func_ty = ir.FunctionType(
             self._codegen(node.return_type),
             [
-                self._codegen(rty)
+                self._codegen(rty.type)
                 for rty in node.arguments.positional_arguments.arguments
             ],
         )
@@ -89,9 +93,9 @@ class ModuleCodeGen:
         self.builder = ir.IRBuilder(entry_block)
 
         for i, arg in enumerate(func.args):
-            arg.name = node.arguments.positional_arguments.arguments[i]
+            arg.name = node.arguments.positional_arguments.arguments[i].name
             alloca = self.builder.alloca(
-                self._codegen(node.arguments.positional_arguments.arguments[i]),
+                self._codegen(node.arguments.positional_arguments.arguments[i].type),
                 name=arg.name,
             )
             self.builder.store(arg, alloca)
@@ -108,17 +112,28 @@ class ModuleCodeGen:
         builder.position_at_start(self.builder.function.entry_basic_block)
         return builder.alloca(_type, size=None, name=name)
 
-    def _codegen_VariableAssign(self, node):
-        if node.value is not None:
-            init_val = self._codegen(node.value)
-        else:
-            pass  # init_val = ir.Constant(ir.DoubleType(), 0.0)
+    def _codegen_VariableAssignFull(self, node):
+        init_val = self._codegen(node.value)
         saved_block = self.builder.block
         var_addr = self._create_entry_block_alloca(node.id.name, init_val.type)
         self.builder.position_at_end(saved_block)
         self.builder.store(init_val, var_addr)
 
         self.symtab[node.id.name] = var_addr
+    
+    def _codegen_VariableDec(self, node):
+        var_type = self._codegen(node.type)
+        var_addr = self._create_entry_block_alloca(node.id.name, var_type)
+        self.symtab[node.id.name] = var_addr
+    
+    def _codegen_VariableAssign(self, node):
+        init_val = self._codegen(node.value)
+        saved_block = self.builder.block
+
+        var_addr = self.symtab[node.id.name]  # TODO: Raise error if not initialized
+
+        self.builder.position_at_end(saved_block)
+        self.builder.store(init_val, var_addr)
 
     def _codegen_Return(self, node):
         retval = self._codegen(node.value)
