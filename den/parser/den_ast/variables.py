@@ -16,7 +16,7 @@ class variables:
             self.id = _id
             self.type = _type
             self.position = position
-    
+
     class VariableAssign(Node):
         def __init__(self, _id, value, position):
             self.id = _id

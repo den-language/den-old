@@ -12,6 +12,12 @@ class functions:
             self.arguments = arguments
             self.block = block
 
+    class FunctionCall(Node):
+        def __init__(self, name, arguments, position):
+            self.position = position
+            self.name = name
+            self.arguments = arguments
+
     class Return(Node):
         def __init__(self, value, position):
             self.value = value

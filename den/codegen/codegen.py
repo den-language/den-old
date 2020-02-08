@@ -14,9 +14,17 @@ class ModuleCodeGen:
 
         self.symtab = {}
 
+        self.functions = []
+
     def generate_code(self, node):
         for statement in node.block.statements:
-            self._codegen(statement)
+            if statement.__class__.__name__ == "FunctionDefinition":
+                addr = self._codegen_function_scaff(statement)
+                self.functions.append((statement, addr))
+            else:
+                self._codegen(statement)
+        for statement, addr in self.functions:
+            self._codegen_FunctionDefinition(statement, addr)
 
     def _codegen(self, node):
         """Node visitor. Dispatches upon node type.
@@ -27,6 +35,9 @@ class ModuleCodeGen:
         if node.__class__.__name__ in ["Add", "Sub", "Mul", "Div", "Mod"]:
             return self._codegen_BinaryOp(node)
         return getattr(self, method)(node)
+
+
+    # Expressions
 
     def _codegen_Neg(self, node):
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
@@ -71,9 +82,16 @@ class ModuleCodeGen:
         else:
             raise NotImplementedError("error")  # TODO: Do error reporting
 
-    def _codegen_FunctionDefinition(self, node):
-        self.symtab = {}
+    
+    # Functions
 
+    def _create_entry_block_alloca(self, name, _type):
+        """Create an alloca in the entry BB of the current function."""
+        builder = ir.IRBuilder()
+        builder.position_at_start(self.builder.function.entry_basic_block)
+        return builder.alloca(_type, size=None, name=name)
+
+    def _codegen_function_scaff(self, node):
         funcname = node.name.name
         func_ty = ir.FunctionType(
             self._codegen(node.return_type),
@@ -88,6 +106,11 @@ class ModuleCodeGen:
             raise NameError(f"ERROR: redefinition of {funcname}")
         else:
             func = ir.Function(self.module, func_ty, funcname)
+
+        return func
+
+    def _codegen_FunctionDefinition(self, node, func):
+        self.symtab = {}
 
         entry_block = func.append_basic_block("entry")
         self.builder = ir.IRBuilder(entry_block)
@@ -106,11 +129,18 @@ class ModuleCodeGen:
 
         return func
 
-    def _create_entry_block_alloca(self, name, _type):
-        """Create an alloca in the entry BB of the current function."""
-        builder = ir.IRBuilder()
-        builder.position_at_start(self.builder.function.entry_basic_block)
-        return builder.alloca(_type, size=None, name=name)
+    def _codegen_FunctionCall(self, node):
+        # TODO: Error reporting
+        called_function = self.module.get_global(node.name.name)
+        # check if function
+        call_args = [self._codegen(argument) for argument in node.arguments.positional_arguments.arguments]
+        return self.builder.call(called_function, call_args, 'calltmp')
+
+    def _codegen_Return(self, node):
+        retval = self._codegen(node.value)
+        self.builder.ret(retval)
+    
+    # Variables
 
     def _codegen_VariableAssignFull(self, node):
         init_val = self._codegen(node.value)
@@ -120,12 +150,12 @@ class ModuleCodeGen:
         self.builder.store(init_val, var_addr)
 
         self.symtab[node.id.name] = var_addr
-    
+
     def _codegen_VariableDec(self, node):
         var_type = self._codegen(node.type)
         var_addr = self._create_entry_block_alloca(node.id.name, var_type)
         self.symtab[node.id.name] = var_addr
-    
+
     def _codegen_VariableAssign(self, node):
         init_val = self._codegen(node.value)
         saved_block = self.builder.block
@@ -135,9 +165,6 @@ class ModuleCodeGen:
         self.builder.position_at_end(saved_block)
         self.builder.store(init_val, var_addr)
 
-    def _codegen_Return(self, node):
-        retval = self._codegen(node.value)
-        self.builder.ret(retval)
 
     @staticmethod
     def _codegen_Type(node):

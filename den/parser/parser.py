@@ -10,6 +10,14 @@ except ModuleNotFoundError:
     import den.helpers.location as location
 
 
+# Arguments Constructor
+def arguments_const(arguments: list):
+    return ast.functions.Arguments(
+        positional=ast.functions.PositionalArguments(arguments),
+        keyword=ast.functions.KeywordArguments([]),
+    )
+
+
 class DenParser(Parser):
     tokens = DenLexer.tokens
     debugfile = "parser.out"
@@ -54,10 +62,14 @@ class DenParser(Parser):
     @_("variable_dec")
     def statement(self, p):
         return p.variable_dec
-    
+
     @_("variable_assign")
     def statement(self, p):
         return p.variable_assign
+    
+    @_("function_call ';'")
+    def statement(self, p):
+        return p.function_call
 
     @_("ret")
     def statement(self, p):
@@ -65,48 +77,71 @@ class DenParser(Parser):
 
     # Functions
 
-    @_("type_id name_id '(' id_items ')' FAT_ARROW '{' block '}'", 
-        "type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'")
+    @_(
+        "type_id name_id '(' id_items ')' FAT_ARROW '{' block '}'",
+        "type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
+    )
     def function_definition(self, p):
         p.block.label = "entry"
         return ast.functions.FunctionDefinition(
             p.type_id,
             p.name_id,
-            ast.functions.Arguments(
-                positional=ast.functions.PositionalArguments(p.id_items),
-            ),
+            arguments_const(p.id_items),
             p.block,
             location.Location(p.type_id.position.sline, p.type_id.position.scol),
         )
-    
-    @_("type_id name_id '(' type_id ':' name_id ')' FAT_ARROW '{' block '}'", 
-        "type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'")
+
+    @_(
+        "type_id name_id '(' type_id ':' name_id ')' FAT_ARROW '{' block '}'",
+        "type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'",
+    )
     def function_definition(self, p):
         p.block.label = "entry"
         p.name_id1.type = p.type_id1
         return ast.functions.FunctionDefinition(
             p.type_id0,
             p.name_id0,
-            ast.functions.Arguments(
-                positional=ast.functions.PositionalArguments([p.name_id1]),
-            ),
+            arguments_const([p.name_id1]),
             p.block,
             location.Location(p.type_id0.position.sline, p.type_id0.position.scol),
         )
-    
-    @_("type_id name_id '(' ')' FAT_ARROW '{' block '}'",
-        "type_id name_id '(' ',' ')' FAT_ARROW '{' block '}'")
+
+    @_(
+        "type_id name_id '(' ')' FAT_ARROW '{' block '}'",
+        "type_id name_id '(' ',' ')' FAT_ARROW '{' block '}'",
+    )
     def function_definition(self, p):
         p.block.label = "entry"
         return ast.functions.FunctionDefinition(
             p.type_id,
             p.name_id,
-            ast.functions.Arguments(
-                positional=ast.functions.PositionalArguments([]),
-                keyword=ast.functions.KeywordArguments([]),
-            ),
+            arguments_const([]),
             p.block,
             location.Location(p.type_id.position.sline, p.type_id.position.scol),
+        )
+
+    @_("name_id '(' ')'", "name_id '(' ',' ')'")
+    def function_call(self, p):
+        return ast.functions.FunctionCall(
+            p.name_id,
+            arguments_const([]),
+            location.Location(p.name_id.position.sline, p.name_id.position.scol),
+        )
+
+    @_("name_id '(' expr ')'", "name_id '(' expr ',' ')'")
+    def function_call(self, p):
+        return ast.functions.FunctionCall(
+            p.name_id,
+            arguments_const([p.expr]),
+            location.Location(p.name_id.position.sline, p.name_id.position.scol),
+        )
+
+    @_("name_id '(' items ')'", "name_id '(' items ',' ')'")
+    def function_call(self, p):
+        return ast.functions.FunctionCall(
+            p.name_id,
+            arguments_const(p.items),
+            location.Location(p.name_id.position.sline, p.name_id.position.scol),
         )
 
     @_("RET expr ';'")
@@ -136,7 +171,7 @@ class DenParser(Parser):
                 ecol=p.expr.position.ecol,
             ),
         )
-    
+
     @_("name_id '=' expr ';'")
     def variable_assign(self, p):
         return ast.variables.VariableAssign(
@@ -149,7 +184,7 @@ class DenParser(Parser):
                 ecol=p.expr.position.ecol,
             ),
         )
-    
+
     @_("type_id ':' name_id ';'")
     def variable_dec(self, p):
         return ast.variables.VariableDec(
@@ -172,13 +207,18 @@ class DenParser(Parser):
     @_("integer")
     def expr(self, p):
         return p.integer
+    
+    @_("function_call")
+    def expr(self, p):
+        return p.function_call
+
+    
+    # Sub expressions
 
     @_("INT")
     def integer(self, p):
         return ast.primitives.Integer(p.INT, location.Location(p.lineno, p.index))
 
-
-    # Sub expressions
     @_("expr ',' expr")
     def items(self, p):
         return [p.expr0, p.expr1]
@@ -186,19 +226,17 @@ class DenParser(Parser):
     @_("items ',' expr")
     def items(self, p):
         return [p.items] + [p.expr0]
-    
 
     @_("type_id ':' name_id ',' type_id ':' name_id")
     def id_items(self, p):
         p.name_id0.type = p.type_id0
         p.name_id1.type = p.type_id1
         return [p.name_id0, p.name_id1]
-    
+
     @_("id_items ',' type_id ':' name_id")
     def id_items(self, p):
         p.name_id.type = p.type_id
         return [p.id_items] + [p.name_id]
-
 
     # Maths with expressions
 
