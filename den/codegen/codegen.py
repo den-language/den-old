@@ -5,6 +5,7 @@ try:
 except ImportError:
     import den.errors.errors as errors
 
+
 class ModuleCodeGen:
     def __init__(self, logger, _ast=None, debug=False):
         self.ast = _ast
@@ -50,7 +51,11 @@ class ModuleCodeGen:
             variable = self.symtab[node.name]
             return self.builder.load(variable, node.name)
         else:
-            self.logger.error(errors.undefined_variable_error, f"Use of undefined variable `{node.name}` detected", node.position)
+            self.logger.error(
+                errors.undefined_variable_error,
+                f"Use of undefined variable `{node.name}` detected",
+                node.position,
+            )
             self.logger.throw()
 
     def _codegen_BinaryOp(self, node):
@@ -77,7 +82,11 @@ class ModuleCodeGen:
         node_name = node.__class__.__name__
 
         if str(left.type) != str(right.type):
-            self.logger.error(errors.type_error, f"Conflicting types between `{left.type.__class__.__name__}` and `{right.type.__class__.__name__}`", left.position)
+            self.logger.error(
+                errors.type_error,
+                f"Conflicting types between `{left.type.__class__.__name__}` and `{right.type.__class__.__name__}`",
+                left.position,
+            )
             self.logger.throw()
         elif (
             str(left.type) in self.builtin_types
@@ -108,7 +117,11 @@ class ModuleCodeGen:
         )
 
         if funcname in self.module.globals:
-            self.logger.error(errors.function_redefinition_error, f"Function `{funcname}` was redefined", node.position)
+            self.logger.error(
+                errors.function_redefinition_error,
+                f"Function `{funcname}` was redefined",
+                node.position,
+            )
             self.logger.throw()
         else:
             func = ir.Function(self.module, func_ty, funcname)
@@ -139,7 +152,11 @@ class ModuleCodeGen:
         try:
             called_function = self.module.get_global(node.name.name)
         except:
-            self.logger.error(errors.undefined_function_error, f"Function `{node.name.name}` is undefined", node.position)
+            self.logger.error(
+                errors.undefined_function_error,
+                f"Function `{node.name.name}` is undefined",
+                node.position,
+            )
             self.logger.throw()
         # check if function
         call_args = [
@@ -175,7 +192,11 @@ class ModuleCodeGen:
         if node.id.name in self.symtab:
             var_addr = self.symtab[node.id.name]
         elif node.id.name not in self.symtab:
-            self.logger.error(errors.uninitialized_variable_error, f"Variable `{node.id.name}` is assigned before its initialization", node.position)
+            self.logger.error(
+                errors.uninitialized_variable_error,
+                f"Variable `{node.id.name}` is assigned before its initialization",
+                node.position,
+            )
             self.logger.throw()
 
         self.builder.position_at_end(saved_block)
