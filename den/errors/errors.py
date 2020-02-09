@@ -6,6 +6,10 @@ class syntax_error(error):
     name = __qualname__
 
 
+class unrecognized_character_error(error):
+    name = __qualname__
+
+
 class undefined_variable_error(error):
     name = __qualname__
 

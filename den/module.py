@@ -18,6 +18,7 @@ class DenModule:
         self.text = text
         self.logger = Logger("test.den", text, debug=True)
         self.parser.set_logger(self.logger)
+        self.lexer.set_logger(self.logger)
 
     def generate(self):
         tokens = self.lexer.tokenize(self.text)

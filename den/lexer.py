@@ -2,11 +2,18 @@ from sly import Lexer
 
 try:
     from helpers.utils import find_column
+    import errors.errors as errors
+    from helpers.location import Location
 except ModuleNotFoundError:
     from den.helpers.utils import find_column
+    import den.errors.errors as errors
+    from den.helpers.location import Location
 
 
 class DenLexer(Lexer):
+    def set_logger(self, logger):
+        self.logger = logger
+
     tokens = {INT, COLON, NEWLINE, ID, FAT_ARROW, RET, STRING}
 
     ignore = " \t"
@@ -32,8 +39,5 @@ class DenLexer(Lexer):
         self.lineno += t.value.count("\n")
 
     def error(self, t):
-        print(
-            f"Illegal character `{t.value[0]}` at line \
-                {self.lineno} col {find_column(self.text, t.index)}"
-        )
+        self.logger.errors(errors.unrecognized_character_error,  f"Illegal character `{t.value}`", Location(t.lineno, t.index))
         self.index += 1
