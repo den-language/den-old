@@ -5,10 +5,12 @@ try:
     from lexer import DenLexer
     import parser.den_ast as ast
     from helpers.location import Location
+    import errors.errors as errors
 except ModuleNotFoundError:
     from den.lexer import DenLexer
     import den.parser.den_ast as ast
     from den.helpers.location import Location
+    import den.errors.errors as errors
 
 
 # Arguments Constructor
@@ -19,7 +21,16 @@ def arguments_const(arguments: list):
     )
 
 
+def empty_node():
+    node = ast.node.Node()
+    node.position = Location(0, 0, eline=0, ecol=0)
+    return node
+
+
 class DenParser(Parser):
+    def set_logger(self, logger):
+        self.logger = logger
+
     tokens = DenLexer.tokens
     log = logging.getLogger()
     log.setLevel(logging.ERROR)
@@ -301,3 +312,98 @@ class DenParser(Parser):
     @_("%prec EMPTY")
     def empty(self, p):
         pass
+
+    # -------------- ERROR REPORTING --------------
+
+    @_("type_id ':' error ';'")
+    def variable_dec(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected ID, found `{p.error.value}`",
+            p.type_id.position,
+        )
+        return empty_node()
+
+    @_("error ':' name_id ';'")
+    def variable_dec(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected type, found `{p.error.value}`",
+            p.name_id.position,
+        )
+        return empty_node()
+
+    @_("error ':' name_id '=' expr ';'")
+    def variable_assign_full(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected type, found `{p.error.value}`",
+            Location(p.lineno, p.index),
+        )
+        return empty_node()
+
+    @_("type_id ':' error '=' expr ';'")
+    def variable_assign_full(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected ID, found `{p.error.value}`",
+            type_id.location,
+        )
+        return empty_node()
+
+    @_("type_id ':' name_id '=' error ';'")
+    def variable_assign_full(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected expression, found `{p.error.value}`",
+            type_id.location,
+        )
+        return empty_node()
+
+    @_("error '=' expr ';'")
+    def variable_assign(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected ID, found `{p.error.value}`",
+            Location(p.lineno, p.index),
+        )
+        return empty_node()
+
+    @_("name_id '=' error ';'")
+    def variable_assign(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected expression, found `{p.error.value}`",
+            name_id.location,
+        )
+        return empty_node()
+
+    @_(
+        "expr '+' error",
+        "expr '-' error",
+        "expr '*' error",
+        "expr '/' error",
+        "expr '%' error",
+    )
+    def expr(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected expression with operand '{p[1]}', found `{p.error.value}`",
+            Location(p.lineno, p.index),
+        )
+        return empty_node()
+
+    @_(
+        "error '+' expr",
+        "error '-' expr",
+        "error '*' expr",
+        "error '/' expr",
+        "error '%' expr",
+    )
+    def expr(self, p):
+        self.logger.error(
+            errors.syntax_error,
+            f"Expected expression with operand '{p[1]}', found `{p.error.value}`",
+            Location(p.lineno, p.index),
+        )
+        return empty_node()

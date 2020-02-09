@@ -13,7 +13,7 @@ int func2(int: z) => {
 }
 
 int test(int: y) => {
-    int: x = fuadnc1(func2(10));
+    int: x = func1(func2(10));
     ret x;
 }
 """

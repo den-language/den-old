@@ -17,9 +17,12 @@ class DenModule:
         self.filename = filename
         self.text = text
         self.logger = Logger("test.den", text, debug=True)
+        self.parser.set_logger(self.logger)
 
     def generate(self):
-        self.result = self.parser.parse(self.lexer.tokenize(self.text))
+        tokens = self.lexer.tokenize(self.text)
+        self.result = self.parser.parse(tokens)
+        self.logger.throw()
         self.result.add_name(self.filename)
         self.module = ModuleCodeGen(self.logger)
         self.module.generate(self.result)
