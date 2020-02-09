@@ -34,13 +34,3 @@ def test_newline():
     data = "\n\n\n\n"
     tokens = list(lexer.tokenize(data))
     assert len(tokens) == 0
-
-
-def test_error():
-    lexer = DenLexer()
-    data = "~"
-    try:
-        tokens = list(lexer.tokenize(data))
-        assert len(tokens) == 0
-    except SyntaxError:
-        assert 1
