@@ -25,6 +25,9 @@ class Logger:
         if self.debug:
             print(f"{Color.BLUE}Debug{Color.RESET}: {message}")
 
+    # def create_arrow(self, pos, prev):
+    #    return " " * (len(self.indent*2) + prev + pos + 1) + "^\n"
+
     def get_lines_string(self, location):
         lineno = location.sline  # Starts at line 1
 
@@ -36,10 +39,14 @@ class Logger:
         final = ""
 
         length = max([len(str(num + 1)) for num in range(start_line, end_line + 1)])
+        remove_whitespace = len(set([len(line) - len(line.lstrip()) for line in newline_split[start_line:end_line]])) <= 1
+
         for i, line in zip(
             range(start_line, end_line + 1), newline_split[start_line:end_line]
         ):
-            final += f"{self.indent*2}{i+1}{' '*(length-len(str(i+1)))} | {line}\n"
+            final += f"{self.indent*2}{i+1}{' '*(length-len(str(i+1)))} | {line if not remove_whitespace else line.lstrip()}\n"
+            # if i == lineno-1:
+            #    final += self.create_arrow(find_column(self.contents, location.scol), length)
 
         return final
 
@@ -58,6 +65,6 @@ class Logger:
                 print(self.get_lines_string(error.location))
                 print(f"{self.indent*2}{Color.RED}{error.message}{Color.RESET}")
                 print(
-                    f"{self.indent*2}{Color.BLUE}{self.file}:{error.location.sline}:{find_column(self.contents, error.location.scol)}{Color.RESET}\n"
+                    f"{self.indent*2}{Color.BLUE}{self.file}:{error.location.sline}:{find_column(self.contents, error.location.scol)-1}{Color.RESET}\n"
                 )
             quit()

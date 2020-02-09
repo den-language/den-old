@@ -4,6 +4,7 @@ from helpers.color import init_color
 init_color()
 
 text = """
+
 int func1(int: z) => {
     ret z;
 }

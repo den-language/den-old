@@ -39,5 +39,9 @@ class DenLexer(Lexer):
         self.lineno += t.value.count("\n")
 
     def error(self, t):
-        self.logger.errors(errors.unrecognized_character_error,  f"Illegal character `{t.value}`", Location(t.lineno, t.index))
+        self.logger.error(
+            errors.unrecognized_character_error,
+            f"Illegal character `{t.value[0]}`",
+            Location(t.lineno, t.index),
+        )
         self.index += 1
