@@ -151,7 +151,7 @@ class ModuleCodeGen:
     def _codegen_FunctionCall(self, node):
         try:
             called_function = self.module.get_global(node.name.name)
-        except:
+        except KeyError:
             self.logger.error(
                 errors.undefined_function_error,
                 f"Function `{node.name.name}` is undefined",

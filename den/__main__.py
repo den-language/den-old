@@ -1,6 +1,5 @@
 from module import DenModule
 from helpers.color import init_color
-from helpers import location
 
 init_color()
 
@@ -14,8 +13,8 @@ int func2(int: z) => {
 }
 
 int test(int: y) => {
-    int: x = func1(func2(10));
-    ret ad;
+    int: x = fuadnc1(func2(10));
+    ret x;
 }
 """
 

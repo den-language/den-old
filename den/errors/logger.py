@@ -26,7 +26,6 @@ class Logger:
             print(f"{Color.BLUE}Debug{Color.RESET}: {message}")
 
     def get_lines_string(self, location):
-        real_col = find_column(self.contents, location.scol)
         lineno = location.sline  # Starts at line 1
 
         newline_split = self.contents.split("\n")
