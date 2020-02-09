@@ -39,7 +39,17 @@ class Logger:
         final = ""
 
         length = max([len(str(num + 1)) for num in range(start_line, end_line + 1)])
-        remove_whitespace = len(set([len(line) - len(line.lstrip()) for line in newline_split[start_line:end_line]])) <= 1
+        remove_whitespace = (
+            len(
+                set(
+                    [
+                        len(line) - len(line.lstrip())
+                        for line in newline_split[start_line:end_line]
+                    ]
+                )
+            )
+            <= 1
+        )
 
         for i, line in zip(
             range(start_line, end_line + 1), newline_split[start_line:end_line]
