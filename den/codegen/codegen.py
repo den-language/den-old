@@ -1,8 +1,12 @@
 from llvmlite import ir
 
+try:
+    import errors.errors as errors
+except ImportError:
+    import den.errors.errors as errors
 
 class ModuleCodeGen:
-    def __init__(self, _ast=None, debug=False):
+    def __init__(self, logger, _ast=None, debug=False):
         self.ast = _ast
         self.debug = debug
         self.module = None
@@ -11,10 +15,10 @@ class ModuleCodeGen:
         self.result = None
 
         self.builtin_types = {}
-
         self.symtab = {}
-
         self.functions = []
+
+        self.logger = logger
 
     def generate_code(self, node):
         for statement in node.block.statements:
@@ -42,9 +46,12 @@ class ModuleCodeGen:
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
 
     def _codegen_RefID(self, node):
-        # TODO: Do error reporting
-        variable = self.symtab[node.name]
-        return self.builder.load(variable, node.name)
+        if node.name in self.symtab:
+            variable = self.symtab[node.name]
+            return self.builder.load(variable, node.name)
+        else:
+            self.logger.error(errors.undefined_variable_error, f"Use of undefined variable `{node.name}` detected", node.position)
+            self.logger.throw()
 
     def _codegen_BinaryOp(self, node):
         left = self._codegen(node.left)
@@ -70,7 +77,8 @@ class ModuleCodeGen:
         node_name = node.__class__.__name__
 
         if str(left.type) != str(right.type):
-            raise TypeError("error")  # TODO: Do error reporting
+            self.logger.error(errors.type_error, f"Conflicting types between `{left.type.__class__.__name__}` and `{right.type.__class__.__name__}`", left.position)
+            self.logger.throw()
         elif (
             str(left.type) in self.builtin_types
             and node_name in self.builtin_types[str(left.type)]
@@ -100,8 +108,8 @@ class ModuleCodeGen:
         )
 
         if funcname in self.module.globals:
-            # TODO get error reporting working
-            raise NameError(f"ERROR: redefinition of {funcname}")
+            self.logger.error(errors.function_redefinition_error, f"Function `{funcname}` was redefined", node.position)
+            self.logger.throw()
         else:
             func = ir.Function(self.module, func_ty, funcname)
 
@@ -128,8 +136,11 @@ class ModuleCodeGen:
         return func
 
     def _codegen_FunctionCall(self, node):
-        # TODO: Error reporting
-        called_function = self.module.get_global(node.name.name)
+        try:
+            called_function = self.module.get_global(node.name.name)
+        except:
+            self.logger.error(errors.undefined_function_error, f"Function `{node.name.name}` is undefined", node.position)
+            self.logger.throw()
         # check if function
         call_args = [
             self._codegen(argument)
@@ -161,7 +172,11 @@ class ModuleCodeGen:
         init_val = self._codegen(node.value)
         saved_block = self.builder.block
 
-        var_addr = self.symtab[node.id.name]  # TODO: Raise error if not initialized
+        if node.id.name in self.symtab:
+            var_addr = self.symtab[node.id.name]
+        elif node.id.name not in self.symtab:
+            self.logger.error(errors.uninitialized_variable_error, f"Variable `{node.id.name}` is assigned before its initialization", node.position)
+            self.logger.throw()
 
         self.builder.position_at_end(saved_block)
         self.builder.store(init_val, var_addr)

@@ -1,13 +1,14 @@
 from sly import Parser
+import logging
 
 try:
     from lexer import DenLexer
     import parser.den_ast as ast
-    import helpers.location as location
+    from helpers.location import Location
 except ModuleNotFoundError:
     from den.lexer import DenLexer
     import den.parser.den_ast as ast
-    import den.helpers.location as location
+    from den.helpers.location import Location
 
 
 # Arguments Constructor
@@ -20,7 +21,9 @@ def arguments_const(arguments: list):
 
 class DenParser(Parser):
     tokens = DenLexer.tokens
-    debugfile = "parser.out"
+    log = logging.getLogger()
+    log.setLevel(logging.ERROR)
+    # debugfile = "parser.out"
 
     precedence = (
         ("left", EMPTY),
@@ -88,7 +91,7 @@ class DenParser(Parser):
             p.name_id,
             arguments_const(p.id_items),
             p.block,
-            location.Location(p.type_id.position.sline, p.type_id.position.scol),
+            Location(p.type_id.position.sline, p.type_id.position.scol),
         )
 
     @_(
@@ -103,7 +106,7 @@ class DenParser(Parser):
             p.name_id0,
             arguments_const([p.name_id1]),
             p.block,
-            location.Location(p.type_id0.position.sline, p.type_id0.position.scol),
+            Location(p.type_id0.position.sline, p.type_id0.position.scol),
         )
 
     @_(
@@ -117,7 +120,7 @@ class DenParser(Parser):
             p.name_id,
             arguments_const([]),
             p.block,
-            location.Location(p.type_id.position.sline, p.type_id.position.scol),
+            Location(p.type_id.position.sline, p.type_id.position.scol),
         )
 
     @_("name_id '(' ')'", "name_id '(' ',' ')'")
@@ -125,7 +128,7 @@ class DenParser(Parser):
         return ast.functions.FunctionCall(
             p.name_id,
             arguments_const([]),
-            location.Location(p.name_id.position.sline, p.name_id.position.scol),
+            Location(p.name_id.position.sline, p.name_id.position.scol),
         )
 
     @_("name_id '(' expr ')'", "name_id '(' expr ',' ')'")
@@ -133,7 +136,7 @@ class DenParser(Parser):
         return ast.functions.FunctionCall(
             p.name_id,
             arguments_const([p.expr]),
-            location.Location(p.name_id.position.sline, p.name_id.position.scol),
+            Location(p.name_id.position.sline, p.name_id.position.scol),
         )
 
     @_("name_id '(' items ')'", "name_id '(' items ',' ')'")
@@ -141,14 +144,14 @@ class DenParser(Parser):
         return ast.functions.FunctionCall(
             p.name_id,
             arguments_const(p.items),
-            location.Location(p.name_id.position.sline, p.name_id.position.scol),
+            Location(p.name_id.position.sline, p.name_id.position.scol),
         )
 
     @_("RET expr ';'")
     def ret(self, p):
         return ast.functions.Return(
             p.expr,
-            location.Location(
+            Location(
                 p.lineno,
                 p.index,
                 eline=p.expr.position.sline,
@@ -164,7 +167,7 @@ class DenParser(Parser):
             p.type_id,
             p.name_id,
             p.expr,
-            location.Location(
+            Location(
                 p.type_id.position.sline,
                 p.type_id.position.scol,
                 eline=p.expr.position.sline,
@@ -177,7 +180,7 @@ class DenParser(Parser):
         return ast.variables.VariableAssign(
             p.name_id,
             p.expr,
-            location.Location(
+            Location(
                 p.name_id.position.sline,
                 p.name_id.position.scol,
                 eline=p.expr.position.sline,
@@ -190,7 +193,7 @@ class DenParser(Parser):
         return ast.variables.VariableDec(
             p.name_id,
             p.type_id,
-            location.Location(
+            Location(
                 p.type_id.position.sline,
                 p.type_id.position.scol,
                 eline=p.name_id.position.sline,
@@ -216,7 +219,7 @@ class DenParser(Parser):
 
     @_("INT")
     def integer(self, p):
-        return ast.primitives.Integer(p.INT, location.Location(p.lineno, p.index))
+        return ast.primitives.Integer(p.INT, Location(p.lineno, p.index))
 
     @_("expr ',' expr")
     def items(self, p):
@@ -242,47 +245,37 @@ class DenParser(Parser):
     @_("'-' expr %prec UMINUS")
     def expr(self, p):
         return ast.maths.Neg(
-            p.expr, location.Location(p.expr.position.sline, p.expr.position.scol)
+            p.expr, Location(p.expr.position.sline, p.expr.position.scol)
         )
 
     @_("expr '+' expr")
     def expr(self, p):
         return ast.maths.Add(
-            p.expr0,
-            p.expr1,
-            location.Location(p.expr0.position.sline, p.expr0.position.scol),
+            p.expr0, p.expr1, Location(p.expr0.position.sline, p.expr0.position.scol),
         )
 
     @_("expr '-' expr")
     def expr(self, p):
         return ast.maths.Sub(
-            p.expr0,
-            p.expr1,
-            location.Location(p.expr0.position.sline, p.expr0.position.scol),
+            p.expr0, p.expr1, Location(p.expr0.position.sline, p.expr0.position.scol),
         )
 
     @_("expr '/' expr")
     def expr(self, p):
         return ast.maths.Div(
-            p.expr0,
-            p.expr1,
-            location.Location(p.expr0.position.sline, p.expr0.position.scol),
+            p.expr0, p.expr1, Location(p.expr0.position.sline, p.expr0.position.scol),
         )
 
     @_("expr '*' expr")
     def expr(self, p):
         return ast.maths.Mul(
-            p.expr0,
-            p.expr1,
-            location.Location(p.expr0.position.sline, p.expr0.position.scol),
+            p.expr0, p.expr1, Location(p.expr0.position.sline, p.expr0.position.scol),
         )
 
     @_("expr '%' expr")
     def expr(self, p):
         return ast.maths.Mod(
-            p.expr0,
-            p.expr1,
-            location.Location(p.expr0.position.sline, p.expr0.position.scol),
+            p.expr0, p.expr1, Location(p.expr0.position.sline, p.expr0.position.scol),
         )
 
     @_("'(' expr ')'")
@@ -293,15 +286,15 @@ class DenParser(Parser):
 
     @_("ID")
     def type_id(self, p):
-        return ast.primitives.Type(p.ID, location.Location(p.lineno, p.index))
+        return ast.primitives.Type(p.ID, Location(p.lineno, p.index))
 
     @_("ID")
     def name_id(self, p):
-        return ast.primitives.NameID(p.ID, location.Location(p.lineno, p.index))
+        return ast.primitives.NameID(p.ID, Location(p.lineno, p.index))
 
     @_("ID")
     def ref_id(self, p):
-        return ast.primitives.RefID(p.ID, location.Location(p.lineno, p.index))
+        return ast.primitives.RefID(p.ID, Location(p.lineno, p.index))
 
     # Empty
 

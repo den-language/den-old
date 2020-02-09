@@ -1,9 +1,9 @@
 from sly import Lexer
 
 try:
-    from utils import find_column
+    from helpers.utils import find_column
 except ModuleNotFoundError:
-    from den.utils import find_column
+    from den.helpers.utils import find_column
 
 
 class DenLexer(Lexer):
@@ -11,7 +11,7 @@ class DenLexer(Lexer):
 
     ignore = " \t"
 
-    literals = {"{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", ";", "%"}
+    literals = {"{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", "%", ";"}
 
     # Tokens
 
@@ -37,4 +37,3 @@ class DenLexer(Lexer):
                 {self.lineno} col {find_column(self.text, t.index)}"
         )
         self.index += 1
-        raise SyntaxError
