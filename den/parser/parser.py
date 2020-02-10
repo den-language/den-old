@@ -91,7 +91,6 @@ class DenParser(Parser):
 
     # Functions
 
-
     @_(
         "type_id name_id '(' id_items ')' FAT_ARROW '{' block '}'",
         "type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
@@ -103,7 +102,7 @@ class DenParser(Parser):
             arguments_const(p.id_items),
             p.block,
             Location(p.type_id.position.sline, p.type_id.position.scol),
-            return_type=p.type_id
+            return_type=p.type_id,
         )
 
     @_(
@@ -118,7 +117,7 @@ class DenParser(Parser):
             arguments_const([p.name_id1]),
             p.block,
             Location(p.type_id0.position.sline, p.type_id0.position.scol),
-            return_type=p.type_id0
+            return_type=p.type_id0,
         )
 
     @_(
@@ -132,9 +131,8 @@ class DenParser(Parser):
             arguments_const([]),
             p.block,
             Location(p.type_id.position.sline, p.type_id.position.scol),
-            return_type=p.type_id
+            return_type=p.type_id,
         )
-    
 
     @_(
         "name_id '(' id_items ')' FAT_ARROW '{' block '}'",
@@ -176,7 +174,6 @@ class DenParser(Parser):
             Location(p.name_id.position.sline, p.name_id.position.scol),
         )
 
-
     @_("name_id FAT_ARROW '{' block '}'")
     def function_definition(self, p):
         p.block.label = "entry"
@@ -186,7 +183,6 @@ class DenParser(Parser):
             p.block,
             Location(p.name_id.position.sline, p.name_id.position.scol),
         )
-
 
     @_("name_id '(' ')'", "name_id '(' ',' ')'")
     def function_call(self, p):

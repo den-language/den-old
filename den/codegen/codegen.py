@@ -3,11 +3,11 @@ from llvmlite import ir
 try:
     import errors.errors as errors
     import parser.den_ast as dast
-    from helpers.location import Location 
+    from helpers.location import Location
 except ImportError:
     import den.errors.errors as errors
     import den.parser.den_ast as dast
-    from den.helpers.location import Location 
+    from den.helpers.location import Location
 
 
 class ModuleCodeGen:
@@ -160,7 +160,11 @@ class ModuleCodeGen:
             self._codegen(statement)
 
         if node.return_none:
-            self._codegen_Return(dast.functions.Return(dast.primitives.Integer(0, Location(0, 0)), Location(0, 0)))
+            self._codegen_Return(
+                dast.functions.Return(
+                    dast.primitives.Integer(0, Location(0, 0)), Location(0, 0)
+                )
+            )
 
         return func
 

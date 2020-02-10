@@ -40,6 +40,5 @@ class DenModule:
         with open("%s.o" % self.result.name, "wb") as o:
             o.write(target_machine.emit_object(mod))
 
-
     def add_text(self, text):
         self.text = text
