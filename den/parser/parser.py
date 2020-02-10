@@ -91,6 +91,7 @@ class DenParser(Parser):
 
     # Functions
 
+
     @_(
         "type_id name_id '(' id_items ')' FAT_ARROW '{' block '}'",
         "type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
@@ -98,11 +99,11 @@ class DenParser(Parser):
     def function_definition(self, p):
         p.block.label = "entry"
         return ast.functions.FunctionDefinition(
-            p.type_id,
             p.name_id,
             arguments_const(p.id_items),
             p.block,
             Location(p.type_id.position.sline, p.type_id.position.scol),
+            return_type=p.type_id
         )
 
     @_(
@@ -113,11 +114,11 @@ class DenParser(Parser):
         p.block.label = "entry"
         p.name_id1.type = p.type_id1
         return ast.functions.FunctionDefinition(
-            p.type_id0,
             p.name_id0,
             arguments_const([p.name_id1]),
             p.block,
             Location(p.type_id0.position.sline, p.type_id0.position.scol),
+            return_type=p.type_id0
         )
 
     @_(
@@ -127,12 +128,65 @@ class DenParser(Parser):
     def function_definition(self, p):
         p.block.label = "entry"
         return ast.functions.FunctionDefinition(
-            p.type_id,
             p.name_id,
             arguments_const([]),
             p.block,
             Location(p.type_id.position.sline, p.type_id.position.scol),
+            return_type=p.type_id
         )
+    
+
+    @_(
+        "name_id '(' id_items ')' FAT_ARROW '{' block '}'",
+        "name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
+    )
+    def function_definition(self, p):
+        p.block.label = "entry"
+        return ast.functions.FunctionDefinition(
+            p.name_id,
+            arguments_const(p.id_items),
+            p.block,
+            Location(p.name_id.position.sline, p.name_id.position.scol),
+        )
+
+    @_(
+        "name_id '(' type_id ':' name_id ')' FAT_ARROW '{' block '}'",
+        "name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'",
+    )
+    def function_definition(self, p):
+        p.block.label = "entry"
+        p.name_id1.type = p.type_id
+        return ast.functions.FunctionDefinition(
+            p.name_id0,
+            arguments_const([p.name_id1]),
+            p.block,
+            Location(p.name_id0.position.sline, p.name_id0.position.scol),
+        )
+
+    @_(
+        "name_id '(' ')' FAT_ARROW '{' block '}'",
+        "name_id '(' ',' ')' FAT_ARROW '{' block '}'",
+    )
+    def function_definition(self, p):
+        p.block.label = "entry"
+        return ast.functions.FunctionDefinition(
+            p.name_id,
+            arguments_const([]),
+            p.block,
+            Location(p.name_id.position.sline, p.name_id.position.scol),
+        )
+
+
+    @_("name_id FAT_ARROW '{' block '}'")
+    def function_definition(self, p):
+        p.block.label = "entry"
+        return ast.functions.FunctionDefinition(
+            p.name_id,
+            arguments_const([]),
+            p.block,
+            Location(p.name_id.position.sline, p.name_id.position.scol),
+        )
+
 
     @_("name_id '(' ')'", "name_id '(' ',' ')'")
     def function_call(self, p):

@@ -1,4 +1,6 @@
 from .node import Node
+from .primitives import primitives
+
 
 # Functions AST nodes
 
@@ -7,16 +9,21 @@ class functions:
     class FunctionDefinition(Node):
         """Function definition class."""
 
-        def __init__(self, return_type, name, arguments, block, position):
+        def __init__(self, name, arguments, block, position, return_type=None):
             """
             Args:
-                return_type (Type): Return type of function
                 name (NameID): Name of function
                 arguments (Arguments): Arguments the function takes
                 block (Block): Block of code to be run
                 position (Location): Position of function definition
+                return_type (Type): Return type of function
             """
-            self.return_type = return_type
+            if return_type is None:
+                self.return_type = primitives.Type("int", position)
+                self.return_none = True
+            else:
+                self.return_type = return_type
+                self.return_none = False
             self.position = position
             self.name = name
             self.arguments = arguments

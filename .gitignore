@@ -130,3 +130,5 @@ dmypy.json
 
 # sly debug file
 parser.out
+
+*.o

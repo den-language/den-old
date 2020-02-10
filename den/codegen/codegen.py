@@ -2,8 +2,12 @@ from llvmlite import ir
 
 try:
     import errors.errors as errors
+    import parser.den_ast as dast
+    from helpers.location import Location 
 except ImportError:
     import den.errors.errors as errors
+    import den.parser.den_ast as dast
+    from den.helpers.location import Location 
 
 
 class ModuleCodeGen:
@@ -42,6 +46,10 @@ class ModuleCodeGen:
         return getattr(self, method)(node)
 
     # Expressions
+
+    @staticmethod
+    def _codegen_Integer(node):
+        return ir.Constant(ir.IntType(32), int(node.value))
 
     def _codegen_Neg(self, node):
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
@@ -116,6 +124,9 @@ class ModuleCodeGen:
             ],
         )
 
+        if funcname == "entry":
+            funcname = "main"
+
         if funcname in self.module.globals:
             self.logger.error(
                 errors.function_redefinition_error,
@@ -144,7 +155,12 @@ class ModuleCodeGen:
             self.symtab[arg.name] = alloca
 
         for statement in node.block.statements:
+            if statement.__class__.__name__ == "Return" and node.return_none:
+                continue
             self._codegen(statement)
+
+        if node.return_none:
+            self._codegen_Return(dast.functions.Return(dast.primitives.Integer(0, Location(0, 0)), Location(0, 0)))
 
         return func
 
@@ -163,6 +179,7 @@ class ModuleCodeGen:
             self._codegen(argument)
             for argument in node.arguments.positional_arguments.arguments
         ]
+
         return self.builder.call(called_function, call_args, "calltmp")
 
     def _codegen_Return(self, node):
@@ -207,12 +224,11 @@ class ModuleCodeGen:
         if node.name == "int":
             return ir.IntType(32)
 
-    @staticmethod
-    def _codegen_Integer(node):
-        return ir.Constant(ir.IntType(32), int(node.value))
-
     def generate(self, _ast):
         self.ast = _ast
         self.module = ir.Module(name=self.ast.name)
         self.generate_code(self.ast)
-        print(self.module)
+
+        self.logger.log(f"\n{self.module}")
+
+        return self.module
