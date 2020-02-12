@@ -131,4 +131,8 @@ dmypy.json
 # sly debug file
 parser.out
 
+# den compiled files
 *.o
+
+# den test build folder
+build/

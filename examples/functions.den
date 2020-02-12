@@ -1,0 +1,18 @@
+
+int func1(int: z) => {
+    ret z;
+}
+
+int func2(int: z) => {
+    ret z;
+}
+
+int test(int: y) => {
+    int: x = func1(func2(y));
+    ret x;
+}
+
+entry => {
+    int: x = test(1239);
+}
+

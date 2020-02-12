@@ -20,4 +20,8 @@ int add(int: x, int: y) => x+y;  # Define add function
 int mul(int: x, int: y) => x*y;  # Define mul function
 ```
 
+# Run
+
+Help - `python3.8 den/ --help`
+
 [Changelog](./changelog.md)
