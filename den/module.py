@@ -1,4 +1,3 @@
-import llvmlite.binding as llvm
 import os
 
 try:

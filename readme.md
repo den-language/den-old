@@ -1,6 +1,6 @@
 # The Den Programming Language
 
-Den is a compiled programming language that is designed to be fast, simple, and modern.
+> Den is a compiled programming language that is designed to be fast, simple, and modern.
 
 ```den
 entry => {  # No arguments so we can skip the parenthesis
@@ -22,7 +22,7 @@ int mul(int: x, int: y) => x*y;  # Define mul function
 
 [Codacy](https://www.codacy.com/manual/MonliH/den)
 
-# Run
+## Run
 
 Help - `python3.8 den/ --help`
 
