@@ -13,7 +13,7 @@ def run_compile(args):
     else:
         print(f"ERROR: No such file {args.filename}")
         quit()
-    
+
     text = " " + text
     module = DenModule(path.basename(args.filename), text=text, debug=args.debug)
     module.generate(folder=args.output)
@@ -21,17 +21,16 @@ def run_compile(args):
 
 parser = argparse.ArgumentParser(
     description="A compiled programming language that is designed to be fast, simple, and modern.",
-    prefix_chars="-+/"
+    prefix_chars="-+/",
 )
 
-parser.add_argument("filename", type=str,
-                    help="A required input file")
+parser.add_argument("filename", type=str, help="A required input file")
 
-parser.add_argument("output", type=str, nargs="?",
-                    help="Optional output folder (defaults to filename)")
+parser.add_argument(
+    "output", type=str, nargs="?", help="Optional output folder (defaults to filename)"
+)
 
-parser.add_argument("-d", "--debug", action="store_true",
-                    help="Turn on debug mode")
+parser.add_argument("-d", "--debug", action="store_true", help="Turn on debug mode")
 
 
 args = parser.parse_args()

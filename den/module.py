@@ -35,7 +35,7 @@ class DenModule:
 
         self.result = self.parser.parse(tokens)
         self.logger.throw()
-    
+
         self.result.add_name(self.filename)
 
         self.logger.log("Started Codegen")
