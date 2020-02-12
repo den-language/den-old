@@ -25,6 +25,10 @@ class Logger:
         if self.debug:
             print(f"{Color.BLUE}Debug{Color.RESET}: {message}\n")
 
+    def status(self, message):
+        if not self.debug:
+            print(f"{message}")
+
     # def create_arrow(self, pos, prev):
     #    return " " * (len(self.indent*2) + prev + pos + 1) + "^\n"
 
