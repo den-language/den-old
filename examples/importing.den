@@ -1,0 +1,5 @@
+import functions.test;
+
+entry => {
+    test(10); # test is a function in the functions.den file
+}
