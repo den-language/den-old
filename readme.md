@@ -19,6 +19,7 @@ int mul(int: x, int: y) => x*y;  # Define mul function
 ```
 
 [Changelog](./changelog.md)
+
 [Codacy](https://www.codacy.com/manual/MonliH/den)
 
 # Run
