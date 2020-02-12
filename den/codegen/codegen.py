@@ -43,6 +43,8 @@ class ModuleCodeGen:
         method = "_codegen_" + node.__class__.__name__
         if node.__class__.__name__ in ["Add", "Sub", "Mul", "Div", "Mod"]:
             return self._codegen_BinaryOp(node)
+
+        self.logger.log(f"Codegen: generating a {node}")
         return getattr(self, method)(node)
 
     # Expressions
@@ -119,8 +121,8 @@ class ModuleCodeGen:
         func_ty = ir.FunctionType(
             self._codegen(node.return_type),
             [
-                self._codegen(rty.type)
-                for rty in node.arguments.positional_arguments.arguments
+                self._codegen(arg.type)
+                for arg in node.arguments.positional_arguments.arguments
             ],
         )
 
@@ -154,17 +156,21 @@ class ModuleCodeGen:
             self.builder.store(arg, alloca)
             self.symtab[arg.name] = alloca
 
-        for statement in node.block.statements:
-            if statement.__class__.__name__ == "Return" and node.return_none:
-                continue
-            self._codegen(statement)
+        if node.block.__class__.__name__ == "Block":
+            for statement in node.block.statements:
+                if statement.__class__.__name__ == "Return" and node.return_none:
+                    continue
+                self._codegen(statement)
 
-        if node.return_none:
-            self._codegen_Return(
-                dast.functions.Return(
-                    dast.primitives.Integer(0, Location(0, 0)), Location(0, 0)
+            if node.return_none:
+                self._codegen_Return(
+                    dast.functions.Return(
+                        dast.primitives.Integer(0, Location(0, 0)), Location(0, 0)
+                    )
                 )
-            )
+
+        else:
+            self._codegen_Return(dast.functions.Return(node.block, Location(0, 0)))
 
         return func
 
@@ -233,6 +239,6 @@ class ModuleCodeGen:
         self.module = ir.Module(name=self.ast.name)
         self.generate_code(self.ast)
 
-        self.logger.log(f"\n{self.module}")
+        self.logger.log(f"Codegen: Generated LLVM IR: \n{self.module}")
 
         return self.module

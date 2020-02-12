@@ -14,7 +14,7 @@ class functions:
             Args:
                 name (NameID): Name of function
                 arguments (Arguments): Arguments the function takes
-                block (Block): Block of code to be run
+                block (Block): Block of code to be run (or expression)
                 position (Location): Position of function definition
                 return_type (Type): Return type of function
             """
@@ -24,6 +24,7 @@ class functions:
             else:
                 self.return_type = return_type
                 self.return_none = False
+
             self.position = position
             self.name = name
             self.arguments = arguments

@@ -1,6 +1,8 @@
 # The Den Programming Language
 
+<---
 [![Codacy Badge](https://img.shields.io/codacy/grade/bdc3b36eff354ef3add854b40115ad53?style=for-the-badge)](https://www.codacy.com/manual/MonliH/den)
+-->
 
 Den is a compiled programming language that is designed to be fast, simple, and modern.
 
@@ -20,8 +22,17 @@ int add(int: x, int: y) => x+y;  # Define add function
 int mul(int: x, int: y) => x*y;  # Define mul function
 ```
 
+[Changelog](./changelog.md)
+[Codacy](https://www.codacy.com/manual/MonliH/den)
+
 # Run
 
 Help - `python3.8 den/ --help`
 
-[Changelog](./changelog.md)
+Running tests:
+
+```bash
+pyenv shell 3.8.1
+pip install -r requirements.txt
+python3.8 -m pytest --cov=.  # --cov for code cov 
+```

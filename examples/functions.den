@@ -1,11 +1,8 @@
-
 int func1(int: z) => {
     ret z;
 }
 
-int func2(int: z) => {
-    ret z;
-}
+int func2(int: z) => z;
 
 int test(int: y) => {
     int: x = func1(func2(y));
