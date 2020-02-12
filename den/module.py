@@ -54,7 +54,7 @@ class DenModule:
 
         if folder is None:
             folder = self.result.name
-        
+
         self.logger.status(
             f"{Color.BOLD}{Color.GREEN}Writing to{Color.RESET} {os.path.abspath(folder)}/{self.result.name}.o"
         )
