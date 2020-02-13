@@ -1,4 +1,5 @@
 import functions.test;
+import a_class_test.car.
 
 entry => {
     test(10); # test is a function in the functions.den file
