@@ -1,0 +1,8 @@
+class Car (str: model, str: company, int: people, str: licence) => {
+    # we can now access this.model etc... in methods
+    get_info => {  # function that doesn't take any arguments other than `this` doesn't need parenthesis
+        print(this.model + this.company);
+    }
+}
+
+public Car;

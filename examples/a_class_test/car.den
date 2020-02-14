@@ -1,7 +1,0 @@
-class Car (str: model, str: company, int: people, str: licence) => {
-    # we can now access this.model etc... in methods
-    get_info => {
-        print(this.model + this.comapany);
-    }
-}
-

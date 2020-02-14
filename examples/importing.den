@@ -1,6 +1,8 @@
 import functions.test;
-import a_class_test.car.
+import object_vehicle.car;
 
 entry => {
     test(10); # test is a function in the functions.den file
+    toyota = car.Car("Corolla", "Toyota", 5, "AWD W3S");
+    toyota.print_info();
 }
