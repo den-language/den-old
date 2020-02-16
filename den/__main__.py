@@ -2,7 +2,7 @@ import argparse
 import os.path as path
 
 from module import DenModule
-from helpers.color import init_color
+from helpers.color import init_color, Color
 from helpers.llvm_gen import initialize
 
 
@@ -11,7 +11,7 @@ def run_compile(args):
         with open(args.filename, "r") as f:
             text = f.read()
     else:
-        print(f"ERROR: No such file {args.filename}")
+        print(f"{Color.RED}ERROR{Color.RESET}: No such file {Color.BLUE}{path.abspath(args.filename)}{Color.RESET}")
         quit()
 
     text = " " + text

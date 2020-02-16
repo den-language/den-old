@@ -22,6 +22,8 @@ int mul(int: x, int: y) => x*y;  # Define mul function
 
 [Codacy](https://www.codacy.com/manual/MonliH/den)
 
+[Trello](https://trello.com/b/gqVgP9Yf/the-den-programming-language)
+
 ## Run
 
 Help - `python3.8 den/ --help`

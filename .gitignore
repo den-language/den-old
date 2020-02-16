@@ -134,5 +134,8 @@ parser.out
 # den compiled files
 *.o
 
+# compiled folder
+functions/
+
 # den test build folder
 build/
