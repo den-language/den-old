@@ -11,7 +11,9 @@ def run_compile(args):
         with open(args.filename, "r") as f:
             text = f.read()
     else:
-        print(f"{Color.RED}ERROR{Color.RESET}: No such file {Color.BLUE}{path.abspath(args.filename)}{Color.RESET}")
+        print(
+            f"{Color.RED}ERROR{Color.RESET}: No such file {Color.BLUE}{path.abspath(args.filename)}{Color.RESET}"
+        )
         quit()
 
     text = " " + text
