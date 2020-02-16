@@ -1,0 +1,12 @@
+class Plane(str: model, str: company, int: people, int: first_class, int: business) => {
+    init => {  # init is called when the class is constructed
+        int: this.economy = this.people - this.business - this.first_class;
+        priv int: this.cockpit_pwd = 102301;
+    }
+
+    get_info => {  # function that doesn't take any arguments other than `this` doesn't need parenthesis
+        print(this.model + this.company);
+    }
+}
+
+public Plane;
