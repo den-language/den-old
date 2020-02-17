@@ -89,6 +89,10 @@ class DenParser(Parser):
     def statement(self, p):
         return p.ret
 
+    @_("simple_import")
+    def statement(self, p):
+        return p.simple_import
+
     # Functions
 
     @_(
@@ -228,7 +232,7 @@ class DenParser(Parser):
                 p.lineno,
                 p.index,
                 eline=p.expr.position.sline,
-                ecol=p.expr.position.ecol,
+                ecol=p.expr.position.scol,
             ),
         )
 
@@ -244,7 +248,7 @@ class DenParser(Parser):
                 p.type_id.position.sline,
                 p.type_id.position.scol,
                 eline=p.expr.position.sline,
-                ecol=p.expr.position.ecol,
+                ecol=p.expr.position.scol,
             ),
         )
 
@@ -257,7 +261,7 @@ class DenParser(Parser):
                 p.name_id.position.sline,
                 p.name_id.position.scol,
                 eline=p.expr.position.sline,
-                ecol=p.expr.position.ecol,
+                ecol=p.expr.position.scol,
             ),
         )
 
@@ -270,7 +274,34 @@ class DenParser(Parser):
                 p.type_id.position.sline,
                 p.type_id.position.scol,
                 eline=p.name_id.position.sline,
-                ecol=p.name_id.position.ecol,
+                ecol=p.name_id.position.scol,
+            ),
+        )
+
+    # Imports
+
+    @_("IMPORT namespace ';'")
+    def simple_import(self, p):
+        return ast.imports.Import(
+            p.namespace,
+            Location(
+                p.lineno,
+                p.index,
+                eline=p.namespace.position.sline,
+                ecol=p.namespace.position.scol,
+            ),
+        )
+
+    @_("IMPORT name_id ';'")
+    def simple_import(self, p):
+        namespace = ast.primitives.Namespace(p.name_id, p.name_id.position)
+        return ast.imports.Import(
+            namespace,
+            Location(
+                p.lineno,
+                p.index,
+                eline=p.name_id.position.sline,
+                ecol=p.name_id.position.scol,
             ),
         )
 
@@ -289,6 +320,25 @@ class DenParser(Parser):
         return p.function_call
 
     # Sub expressions
+
+    @_("namespace '.' name_id")
+    def namespace(self, p):
+        namespace.push(p.name_id)
+        return namespace
+
+    @_("name_id '.' name_id")
+    def namespace(self, p):
+        namespace = ast.primitives.Namespace(
+            p.name_id0,
+            Location(
+                p.name_id0.position.sline,
+                p.name_id0.position.scol,
+                eline=p.name_id1.position.sline,
+                ecol=p.name_id1.position.scol,
+            ),
+        )
+        namespace.push(p.name_id1)
+        return namespace
 
     @_("INT")
     def integer(self, p):

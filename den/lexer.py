@@ -14,11 +14,27 @@ class DenLexer(Lexer):
     def set_logger(self, logger):
         self.logger = logger
 
-    tokens = {INT, COLON, NEWLINE, ID, FAT_ARROW, RET, STRING}
+    tokens = {INT, COLON, NEWLINE, ID, FAT_ARROW, RET, STRING, IMPORT}
 
     ignore = " \t"
 
-    literals = {"{", "}", "(", ")", "=", ",", ":", "+", "-", "/", "*", "&", "%", ";"}
+    literals = {
+        "{",
+        "}",
+        "(",
+        ")",
+        "=",
+        ",",
+        ":",
+        "+",
+        "-",
+        "/",
+        "*",
+        "&",
+        "%",
+        ";",
+        ".",
+    }
 
     # Tokens
 
@@ -27,6 +43,7 @@ class DenLexer(Lexer):
 
     ID = r"[a-zA-Z_][a-zA-Z0-9_]*"
     ID["ret"] = RET
+    ID["import"] = IMPORT
 
     INT = r"\d+"
     FAT_ARROW = r"=>"

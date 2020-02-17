@@ -1,3 +1,5 @@
+import os
+
 try:
     from helpers.color import Color
     from helpers.utils import find_column
@@ -79,6 +81,6 @@ class Logger:
                 print(self.get_lines_string(error.location))
                 print(f"{self.indent*2}{Color.RED}{error.message}{Color.RESET}")
                 print(
-                    f"{self.indent*2}{Color.BLUE}{self.file}:{error.location.sline}:{find_column(self.contents, error.location.scol)-1}{Color.RESET}\n"
+                    f"{self.indent*2}{Color.BLUE}{os.path.relpath(self.file)}:{error.location.sline}:{find_column(self.contents, error.location.scol)-1}{Color.RESET}\n"
                 )
             quit()

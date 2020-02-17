@@ -66,3 +66,22 @@ class primitives:
             """
             self.name = name
             self.position = position
+
+    class Namespace(Node):
+        """Namespace node for imports and references"""
+
+        def __init__(self, _id, position):
+            """
+            Args:
+                _id (NameID): Name of variable to add.
+                position (Location): Position of namespace.
+            """
+            self.ids = [_id]
+            self.position = position
+
+        def push(self, _id):
+            """
+            Args:
+                _id (NameID): Name of variable to add.
+            """
+            self.ids.append(_id)

@@ -1,43 +1,34 @@
 import argparse
 import os.path as path
 
-from module import DenModule
+from codegen import DenModule
 from helpers.color import init_color, Color
 from helpers.llvm_gen import initialize
+from codegen.generate_module import run_compile
 
 
-def run_compile(args):
-    if path.isfile(args.filename):
-        with open(args.filename, "r") as f:
-            text = f.read()
-    else:
-        print(
-            f"{Color.RED}ERROR{Color.RESET}: No such file {Color.BLUE}{path.abspath(args.filename)}{Color.RESET}"
-        )
-        quit()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="A compiled programming language that is designed to be fast, simple, and modern.",
+        prefix_chars="-+/",
+    )
 
-    text = " " + text
-    module = DenModule(path.basename(args.filename), text=text, debug=args.debug)
-    module.generate(folder=args.output)
+    parser.add_argument("filename", type=str, help="A required input file")
 
+    parser.add_argument(
+        "output",
+        type=str,
+        nargs="?",
+        help="Optional output folder (defaults to filename)",
+    )
 
-parser = argparse.ArgumentParser(
-    description="A compiled programming language that is designed to be fast, simple, and modern.",
-    prefix_chars="-+/",
-)
+    parser.add_argument("-d", "--debug", action="store_true", help="Turn on debug mode")
 
-parser.add_argument("filename", type=str, help="A required input file")
+    args = parser.parse_args()
 
-parser.add_argument(
-    "output", type=str, nargs="?", help="Optional output folder (defaults to filename)"
-)
+    init_color()
+    initialize()
 
-parser.add_argument("-d", "--debug", action="store_true", help="Turn on debug mode")
-
-
-args = parser.parse_args()
-
-init_color()
-initialize()
-
-run_compile(args)
+    module = run_compile(args.filename, args.debug)
+    module.generate()
+    module.write(folder=args.output)

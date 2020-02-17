@@ -1,12 +1,12 @@
 import functions.test;
-import object_vehicle.car;
-import object_vehicle.airplane.Plane;
+# import object_vehicle.car;
+# import object_vehicle.airplane.Plane;
 
 entry => {
     test(10); # test is a function in the functions.den file
-    toyota = car.Car("Corolla", "Toyota", 5, "AWD W3S");
-    toyota.print_info();
+    # toyota = car.Car("Corolla", "Toyota", 5, "AWD W3S");
+    # toyota.print_info();
 
-    boeing = Plane("747", "Boeing", 416, 30, 180);
-    boeing.print_info();
+    # boeing = Plane("747", "Boeing", 416, 30, 180);
+    # boeing.print_info();
 }

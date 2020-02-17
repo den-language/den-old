@@ -1,4 +1,6 @@
 from llvmlite import ir
+import os
+from .generate_module import run_compile
 
 try:
     import errors.errors as errors
@@ -11,17 +13,20 @@ except ImportError:
 
 
 class ModuleCodeGen:
-    def __init__(self, logger, _ast=None, debug=False):
+    def __init__(self, logger, modules, path, _ast=None, debug=False):
         self.ast = _ast
         self.debug = debug
         self.module = None
         self.builder = None
+        self.path = path
 
         self.result = None
 
         self.builtin_types = {}
         self.symtab = {}
         self.functions = []
+
+        self.modules = modules
 
         self.logger = logger
 
@@ -56,6 +61,38 @@ class ModuleCodeGen:
     def _codegen_Neg(self, node):
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
 
+    def _codegen_Import(self, node):
+        import_path = list(
+            filter(None, os.path.normpath(os.path.dirname(self.path)).split(os.sep))
+        )
+
+        for i, name in enumerate(node.namespace.ids):
+            if os.path.isfile(
+                os.path.join(
+                    os.sep, os.path.join(*import_path), (filename := f"{name.name}.den")
+                )
+            ):
+                import_path.append(filename)
+            elif os.path.isdir(
+                os.path.join(
+                    os.sep,
+                    os.path.join(*import_path),
+                    (dirname := f"{name.name}{os.sep}"),
+                )
+            ):
+                import_path.append(dirname)
+            else:
+                last_index = i
+                break
+            last_index = i
+
+        module = run_compile(os.path.join(os.sep, *import_path), self.logger.debug)
+        if len(node.namespace.ids[last_index:]) == 0:
+            pass
+        else:
+            for name in node.namespace.ids[last_index:]:
+                pass
+
     def _codegen_RefID(self, node):
         if node.name in self.symtab:
             variable = self.symtab[node.name]
@@ -63,7 +100,7 @@ class ModuleCodeGen:
         else:
             self.logger.error(
                 errors.undefined_variable_error,
-                f"Use of undefined variable `{node.name}` detected",
+                f"Use of undefined object `{node.name}` detected",
                 node.position,
             )
             self.logger.throw()

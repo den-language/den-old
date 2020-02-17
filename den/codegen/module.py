@@ -17,25 +17,31 @@ except ImportError:
 
 
 class DenModule:
-    def __init__(self, filename, text="", debug=False):
+    def __init__(self, filename, abspath, text="", debug=False):
         self.lexer = DenLexer()
         self.parser = DenParser()
         self.filename = filename
+        self.fullpath = abspath
         self.text = text
-        self.logger = Logger(self.filename, text, debug=debug)
+        self.logger = Logger(self.fullpath, text, debug=debug)
+
+        self.modules = {}
 
         self.parser.set_logger(self.logger)
         self.lexer.set_logger(self.logger)
 
-    def generate(self, folder=None):
-        fullpath = os.path.abspath(self.filename)
+    def generate(self):
         self.logger.log("Started Lexing")
-        self.logger.status(f"{Color.BOLD}{Color.GREEN}Lexing{Color.RESET} {fullpath}")
+        self.logger.status(
+            f"{Color.BOLD}{Color.GREEN}Lexing{Color.RESET} {self.fullpath}"
+        )
 
         tokens = self.lexer.tokenize(self.text)
 
         self.logger.log("Started Parsing")
-        self.logger.status(f"{Color.BOLD}{Color.GREEN}Parsing{Color.RESET}  {fullpath}")
+        self.logger.status(
+            f"{Color.BOLD}{Color.GREEN}Parsing{Color.RESET}  {self.fullpath}"
+        )
 
         self.result = self.parser.parse(tokens)
         self.logger.throw()
@@ -44,13 +50,14 @@ class DenModule:
 
         self.logger.log("Started Codegen")
         self.logger.status(
-            f"{Color.BOLD}{Color.GREEN}Generating{Color.RESET} {fullpath}"
+            f"{Color.BOLD}{Color.GREEN}Generating{Color.RESET} {self.fullpath}"
         )
 
-        self.module = ModuleCodeGen(self.logger)
+        self.module = ModuleCodeGen(self.logger, self.modules, self.fullpath)
         self.ir = self.module.generate(self.result)
         self.logger.throw()
 
+    def write(self, folder=None):
         if folder is None:
             folder = self.result.name
 

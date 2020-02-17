@@ -21,7 +21,7 @@ class variables:
             self.position = position
 
     class VariableDec(Node):
-        """Variable declaration with ID and type"""
+        """Variable declaration with ID and type."""
 
         def __init__(self, _id, _type, position):
             """
@@ -35,7 +35,7 @@ class variables:
             self.position = position
 
     class VariableAssign(Node):
-        """Variable assignment with ID and value"""
+        """Variable assignment with ID and value."""
 
         def __init__(self, _id, value, position):
             """

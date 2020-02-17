@@ -28,3 +28,7 @@ class function_redefinition_error(error):
 
 class type_error(error):
     name = __qualname__
+
+
+class import_error(error):
+    name = __qualname__
