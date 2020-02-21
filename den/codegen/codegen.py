@@ -86,12 +86,23 @@ class ModuleCodeGen:
                 break
             last_index = i
 
-        module = run_compile(os.path.join(os.sep, *import_path), self.logger.debug)
+        path = os.path.join(os.sep, *import_path)
+        module = run_compile(path, self.logger.debug)
+        module.generate()
+
+        self.modules[str(path)] = module.ir
+
         if len(node.namespace.ids[last_index:]) == 0:
+            # we import whole file
             pass
         else:
             for name in node.namespace.ids[last_index:]:
-                pass
+                # we import one function/object from a file
+                print(name.name)
+                if name.name in self.modules[path].global_values:
+                    print()
+        
+        self.modules[str(path)].write() # TODO: Add folder
 
     def _codegen_RefID(self, node):
         if node.name in self.symtab:

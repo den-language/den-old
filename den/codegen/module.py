@@ -20,6 +20,8 @@ class DenModule:
     def __init__(self, filename, abspath, text="", debug=False):
         self.lexer = DenLexer()
         self.parser = DenParser()
+        self.ir = None
+
         self.filename = filename
         self.fullpath = abspath
         self.text = text
