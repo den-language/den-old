@@ -18,7 +18,7 @@ class Error:
 class Logger:
     def __init__(self, filename, contents, debug=False):
         self.file = filename
-        self.contents = contents
+        self.contents = contents[1:]
         self.debug = debug
         self.errors = []
         self.indent = "  "
@@ -83,4 +83,5 @@ class Logger:
                 print(
                     f"{self.indent*2}{Color.BLUE}{os.path.relpath(self.file)}:{error.location.sline}:{find_column(self.contents, error.location.scol)-1}{Color.RESET}\n"
                 )
-            quit()
+
+            quit(1)

@@ -33,17 +33,16 @@ class DenModule:
         self.lexer.set_logger(self.logger)
 
     def generate(self):
+
+        relpath = os.path.relpath(self.fullpath)
+
         self.logger.log("Started Lexing")
-        self.logger.status(
-            f"{Color.BOLD}{Color.GREEN}Lexing{Color.RESET} {self.fullpath}"
-        )
+        self.logger.status(f"{Color.BOLD}{Color.GREEN}Lexing{Color.RESET} {relpath}")
 
         tokens = self.lexer.tokenize(self.text)
 
         self.logger.log("Started Parsing")
-        self.logger.status(
-            f"{Color.BOLD}{Color.GREEN}Parsing{Color.RESET}  {self.fullpath}"
-        )
+        self.logger.status(f"{Color.BOLD}{Color.GREEN}Parsing{Color.RESET} {relpath}")
 
         self.result = self.parser.parse(tokens)
         self.logger.throw()
@@ -52,7 +51,7 @@ class DenModule:
 
         self.logger.log("Started Codegen")
         self.logger.status(
-            f"{Color.BOLD}{Color.GREEN}Generating{Color.RESET} {self.fullpath}"
+            f"{Color.BOLD}{Color.GREEN}Generating{Color.RESET} {relpath}"
         )
 
         self.module = ModuleCodeGen(self.logger, self.modules, self.fullpath)
@@ -61,10 +60,10 @@ class DenModule:
 
     def write(self, folder=None):
         if folder is None:
-            folder = self.result.name
+            folder = "./build"
 
         self.logger.status(
-            f"{Color.BOLD}{Color.GREEN}Writing to{Color.RESET} {os.path.abspath(folder)}/{self.result.name}.o"
+            f"{Color.BOLD}{Color.GREEN}Writing to{Color.RESET} {os.path.relpath(folder)}/{self.result.name}.o"
         )
 
         # Generate object file that is linked to excecutable
@@ -75,8 +74,6 @@ class DenModule:
 
         with open(f"{folder}/{self.result.name}.o", "wb+") as o:
             o.write(target_machine.emit_object(mod))
-
-        print(f"{Color.BOLD}{Color.BLUE}All Done!{Color.RESET} 🎉")
 
     def add_text(self, text):
         self.text = text

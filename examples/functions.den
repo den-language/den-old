@@ -8,8 +8,3 @@ int test(int: y) => {
     int: x = func1(func2(y));
     ret x;
 }
-
-entry => {
-    int: x = test(1239);
-}
-

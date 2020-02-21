@@ -323,8 +323,8 @@ class DenParser(Parser):
 
     @_("namespace '.' name_id")
     def namespace(self, p):
-        namespace.push(p.name_id)
-        return namespace
+        p.namespace.push(p.name_id)
+        return p.namespace
 
     @_("name_id '.' name_id")
     def namespace(self, p):

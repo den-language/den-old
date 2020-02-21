@@ -19,7 +19,7 @@ if __name__ == "__main__":
         "output",
         type=str,
         nargs="?",
-        help="Optional output folder (defaults to filename)",
+        help="Optional output folder (defaults to `./build/`)",
     )
 
     parser.add_argument("-d", "--debug", action="store_true", help="Turn on debug mode")
@@ -32,3 +32,5 @@ if __name__ == "__main__":
     module = run_compile(args.filename, args.debug)
     module.generate()
     module.write(folder=args.output)
+
+    print(f"{Color.BOLD}{Color.BLUE}All Done!{Color.RESET} 🎉")

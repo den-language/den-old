@@ -32,3 +32,7 @@ class type_error(error):
 
 class import_error(error):
     name = __qualname__
+
+
+class not_implemented_error(error):
+    name = __qualname__

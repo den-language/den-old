@@ -62,6 +62,8 @@ class ModuleCodeGen:
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
 
     def _codegen_Import(self, node):
+        func_signature = None
+
         import_path = list(
             filter(None, os.path.normpath(os.path.dirname(self.path)).split(os.sep))
         )
@@ -90,19 +92,44 @@ class ModuleCodeGen:
         module = run_compile(path, self.logger.debug)
         module.generate()
 
-        self.modules[str(path)] = module.ir
+        self.modules[str(path)] = module
 
         if len(node.namespace.ids[last_index:]) == 0:
             # we import whole file
             pass
         else:
-            for name in node.namespace.ids[last_index:]:
+            if len(node.namespace.ids[last_index:]) == 1:
                 # we import one function/object from a file
-                print(name.name)
-                if name.name in self.modules[path].global_values:
-                    print()
-        
-        self.modules[str(path)].write() # TODO: Add folder
+                try:
+                    symbol = self.modules[str(path)].ir.get_global(name.name)
+                except KeyError:
+                    self.logger.error(
+                        errors.import_error,
+                        f"Symbol `{name.name}` does not exist in file `{os.path.relpath(path)}`",
+                        name.position,
+                    )
+                    self.logger.throw()
+                func_signature = ir.Function(
+                    self.module,
+                    ir.FunctionType(
+                        symbol.return_value.type, [arg.type for arg in symbol.args]
+                    ),
+                    name=name.name,
+                )
+                self.symtab[name.name] = func_signature
+            else:
+                for name in node.namespace.ids[last_index:]:
+                    # we import a file from a file etc.
+                    self.logger.error(
+                        errors.not_implemented_error,
+                        f"Multi-depth imports not supported (for now)",
+                        name.position,
+                    )
+                    self.logger.throw()
+
+        self.modules[str(path)].write()  # TODO: Add folder
+
+        return func_signature
 
     def _codegen_RefID(self, node):
         if node.name in self.symtab:
