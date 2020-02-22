@@ -17,17 +17,20 @@ except ImportError:
 
 
 class DenModule:
-    def __init__(self, filename, abspath, text="", debug=False):
+    def __init__(self, filename, abspath, output, text="", debug=False):
         self.lexer = DenLexer()
         self.parser = DenParser()
         self.ir = None
 
         self.filename = filename
+        self.output_file = os.path.abspath("build/a.out") if output is None else output
+
         self.fullpath = abspath
         self.text = text
         self.logger = Logger(self.fullpath, text, debug=debug)
 
         self.modules = {}
+        self.to_link = []
 
         self.parser.set_logger(self.logger)
         self.lexer.set_logger(self.logger)
@@ -54,25 +57,29 @@ class DenModule:
             f"{Color.BOLD}{Color.GREEN}Generating{Color.RESET} {relpath}"
         )
 
-        self.module = ModuleCodeGen(self.logger, self.modules, self.fullpath)
+        self.output = (
+            f"{os.path.join(os.path.dirname(self.output_file), self.result.name)}.o"
+        )
+        self.to_link.append(self.output)
+
+        self.module = ModuleCodeGen(
+            self.logger, self.modules, self.fullpath, self.output, self.to_link
+        )
         self.ir = self.module.generate(self.result)
         self.logger.throw()
 
-    def write(self, folder=None):
-        if folder is None:
-            folder = "./build"
-
+    def write(self):
         self.logger.status(
-            f"{Color.BOLD}{Color.GREEN}Writing to{Color.RESET} {os.path.relpath(folder)}/{self.result.name}.o"
+            f"{Color.BOLD}{Color.GREEN}Writing to{Color.RESET} {os.path.relpath(self.output)}"
         )
 
         # Generate object file that is linked to excecutable
         mod, target_machine = compile_ir(self.ir)
 
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+        if not os.path.exists(os.path.dirname(self.output)):
+            os.makedirs(os.path.dirname(self.output))
 
-        with open(f"{folder}/{self.result.name}.o", "wb+") as o:
+        with open(f"{self.output}", "wb+") as o:
             o.write(target_machine.emit_object(mod))
 
     def add_text(self, text):

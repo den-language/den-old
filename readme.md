@@ -3,7 +3,7 @@
 Den is a compiled programming language that is designed to be fast, simple, and modern.
 
 ```den
-entry => {  # No arguments so we can skip the parenthesis
+pub entry => {  # No arguments so we can skip the parenthesis
     int: x;
     int: y = &x - 1;  # Create a relationship between x and y
 
@@ -31,3 +31,9 @@ pyenv shell 3.8.1
 pip install -r requirements.txt
 python3.8 -m pytest --cov=.  # --cov for code cov 
 ```
+
+Note: code coverage right now is bad because tests are not rigorous enough; subject to change.
+
+## Notes
+
+* Functions are private by default, meaning they can be used in the file they are defined in, but **ONLY** in the file they are defined in.

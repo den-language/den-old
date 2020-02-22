@@ -9,10 +9,11 @@ class functions:
     class FunctionDefinition(Node):
         """Function definition class."""
 
-        def __init__(self, name, arguments, block, position, return_type=None):
+        def __init__(self, name, public, arguments, block, position, return_type=None):
             """
             Args:
                 name (NameID): Name of function
+                public (bool): Weather function is public or private
                 arguments (Arguments): Arguments the function takes
                 block (Block): Block of code to be run (or expression)
                 position (Location): Position of function definition
@@ -29,6 +30,7 @@ class functions:
             self.name = name
             self.arguments = arguments
             self.block = block
+            self.public = public
 
     class FunctionCall(Node):
         """Function call class."""

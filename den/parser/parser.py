@@ -100,11 +100,17 @@ class DenParser(Parser):
         "type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
         "type_id name_id '(' id_items ')' FAT_ARROW expr ';'",
         "type_id name_id '(' id_items ',' ')' FAT_ARROW expr ';'",
+        "PUB type_id name_id '(' id_items ')' FAT_ARROW '{' block '}'",
+        "PUB type_id name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
+        "PUB type_id name_id '(' id_items ')' FAT_ARROW expr ';'",
+        "PUB type_id name_id '(' id_items ',' ')' FAT_ARROW expr ';'",
     )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id,
+            pub,
             arguments_const(p.id_items),
             block,
             Location(p.type_id.position.sline, p.type_id.position.scol),
@@ -116,12 +122,18 @@ class DenParser(Parser):
         "type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'",
         "type_id name_id '(' type_id ':' name_id ')' FAT_ARROW expr ';'",
         "type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW expr ';'",
+        "PUB type_id name_id '(' type_id ':' name_id ')' FAT_ARROW '{' block '}'",
+        "PUB type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'",
+        "PUB type_id name_id '(' type_id ':' name_id ')' FAT_ARROW expr ';'",
+        "PUB type_id name_id '(' type_id ':' name_id ',' ')' FAT_ARROW expr ';'",
     )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
         p.name_id1.type = p.type_id1
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id0,
+            pub,
             arguments_const([p.name_id1]),
             block,
             Location(p.type_id0.position.sline, p.type_id0.position.scol),
@@ -133,11 +145,17 @@ class DenParser(Parser):
         "type_id name_id '(' ',' ')' FAT_ARROW '{' block '}'",
         "type_id name_id '(' ')' FAT_ARROW expr ';'",
         "type_id name_id '(' ',' ')' FAT_ARROW expr ';'",
+        "PUB type_id name_id '(' ')' FAT_ARROW '{' block '}'",
+        "PUB type_id name_id '(' ',' ')' FAT_ARROW '{' block '}'",
+        "PUB type_id name_id '(' ')' FAT_ARROW expr ';'",
+        "PUB type_id name_id '(' ',' ')' FAT_ARROW expr ';'",
     )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id,
+            pub,
             arguments_const([]),
             block,
             Location(p.type_id.position.sline, p.type_id.position.scol),
@@ -149,11 +167,17 @@ class DenParser(Parser):
         "name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
         "name_id '(' id_items ')' FAT_ARROW expr ';'",
         "name_id '(' id_items ',' ')' FAT_ARROW expr ';'",
+        "PUB name_id '(' id_items ')' FAT_ARROW '{' block '}'",
+        "PUB name_id '(' id_items ',' ')' FAT_ARROW '{' block '}'",
+        "PUB name_id '(' id_items ')' FAT_ARROW expr ';'",
+        "PUB name_id '(' id_items ',' ')' FAT_ARROW expr ';'",
     )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id,
+            pub,
             arguments_const(p.id_items),
             block,
             Location(p.name_id.position.sline, p.name_id.position.scol),
@@ -164,12 +188,18 @@ class DenParser(Parser):
         "name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'",
         "name_id '(' type_id ':' name_id ')' FAT_ARROW expr ';'",
         "name_id '(' type_id ':' name_id ',' ')' FAT_ARROW expr ';'",
+        "PUB name_id '(' type_id ':' name_id ')' FAT_ARROW '{' block '}'",
+        "PUB name_id '(' type_id ':' name_id ',' ')' FAT_ARROW '{' block '}'",
+        "PUB name_id '(' type_id ':' name_id ')' FAT_ARROW expr ';'",
+        "PUB name_id '(' type_id ':' name_id ',' ')' FAT_ARROW expr ';'",
     )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
         p.name_id1.type = p.type_id
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id0,
+            pub,
             arguments_const([p.name_id1]),
             block,
             Location(p.name_id0.position.sline, p.name_id0.position.scol),
@@ -180,21 +210,34 @@ class DenParser(Parser):
         "name_id '(' ',' ')' FAT_ARROW '{' block '}'",
         "name_id '(' ')' FAT_ARROW expr ';'",
         "name_id '(' ',' ')' FAT_ARROW expr ';'",
+        "PUB name_id '(' ')' FAT_ARROW '{' block '}'",
+        "PUB name_id '(' ',' ')' FAT_ARROW '{' block '}'",
+        "PUB name_id '(' ')' FAT_ARROW expr ';'",
+        "PUB name_id '(' ',' ')' FAT_ARROW expr ';'",
     )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id,
+            pub,
             arguments_const([]),
             block,
             Location(p.name_id.position.sline, p.name_id.position.scol),
         )
 
-    @_("name_id FAT_ARROW '{' block '}'", "name_id FAT_ARROW expr ';'")
+    @_(
+        "name_id FAT_ARROW '{' block '}'",
+        "name_id FAT_ARROW expr ';'",
+        "PUB name_id FAT_ARROW '{' block '}'",
+        "PUB name_id FAT_ARROW expr ';'",
+    )
     def function_definition(self, p):
         block = p.block if "block" in p._namemap else p.expr
+        pub = True if "PUB" in p._namemap else False
         return ast.functions.FunctionDefinition(
             p.name_id,
+            pub,
             arguments_const([]),
             block,
             Location(p.name_id.position.sline, p.name_id.position.scol),
@@ -204,6 +247,7 @@ class DenParser(Parser):
     def function_call(self, p):
         return ast.functions.FunctionCall(
             p.name_id,
+            pub,
             arguments_const([]),
             Location(p.name_id.position.sline, p.name_id.position.scol),
         )

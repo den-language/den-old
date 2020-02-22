@@ -13,7 +13,7 @@ except ImportError:
 
 
 class ModuleCodeGen:
-    def __init__(self, logger, modules, path, _ast=None, debug=False):
+    def __init__(self, logger, modules, path, output, to_link, _ast=None, debug=False):
         self.ast = _ast
         self.debug = debug
         self.module = None
@@ -21,6 +21,8 @@ class ModuleCodeGen:
         self.path = path
 
         self.result = None
+        self.output = output
+        self.to_link = to_link
 
         self.builtin_types = {}
         self.symtab = {}
@@ -39,6 +41,24 @@ class ModuleCodeGen:
                 self._codegen(statement)
         for statement, addr in self.functions:
             self._codegen_FunctionDefinition(statement, addr)
+        # try:
+        #    self.module.get_global("main")
+        # except KeyError:
+        #    main_ast = dast.functions.FunctionDefinition(
+        #        dast.primitives.NameID("main", Location(0, 0)),
+        #        True,
+        #        dast.functions.Arguments(
+        #            positional=dast.functions.PositionalArguments([]),
+        #            keyword=dast.functions.KeywordArguments([]),
+        #        ),
+        #        dast.meta.Block(
+        #            [dast.functions.Return(0, Location(0, 0))], Location(0, 0)
+        #        ),
+        #        Location(0, 0),
+        #    )
+        #    addr = self._codegen_function_scaff(main_ast)
+        #    self.symtab["main"] = addr
+        #    main_func = self._codegen_FunctionDefinition(main_ast, addr)
 
     def _codegen(self, node):
         """Node visitor. Dispatches upon node type.
@@ -89,8 +109,11 @@ class ModuleCodeGen:
             last_index = i
 
         path = os.path.join(os.sep, *import_path)
-        module = run_compile(path, self.logger.debug)
+
+        module = run_compile(path, self.logger.debug, self.output)
         module.generate()
+
+        self.to_link.append(module.output)
 
         self.modules[str(path)] = module
 
@@ -109,6 +132,15 @@ class ModuleCodeGen:
                         name.position,
                     )
                     self.logger.throw()
+
+                if symbol.linkage == "private":
+                    self.logger.error(
+                        errors.import_error,
+                        f"Attempted to import `{name.name}` which is private in file `{os.path.relpath(path)}`",
+                        name.position,
+                    )
+                    self.logger.throw()
+
                 func_signature = ir.Function(
                     self.module,
                     ir.FunctionType(
@@ -218,6 +250,7 @@ class ModuleCodeGen:
 
     def _codegen_FunctionDefinition(self, node, func):
         self.symtab = {}
+        func.linkage = "private" if not node.public else "external"
 
         entry_block = func.append_basic_block("entry")
         self.builder = ir.IRBuilder(entry_block)
