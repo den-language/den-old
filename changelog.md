@@ -2,7 +2,9 @@
 
 To be released February 16, 2020.
 
-- Transpiles to LLVM IR?
+- Transpiles to LLVM IR
+- Visibility; private by default (`pub`) 
+- Imports
 - Function declarations
 - Variable declarations
 - Variable assignments
