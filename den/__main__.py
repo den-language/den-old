@@ -1,8 +1,6 @@
 import argparse
-import os.path as path
 import subprocess  # For linking object files (don't scream at me)
 
-from codegen import DenModule
 from helpers.color import init_color, Color
 from helpers.llvm_gen import initialize
 from codegen.generate_module import run_compile
