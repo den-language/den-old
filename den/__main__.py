@@ -36,7 +36,13 @@ if __name__ == "__main__":
     if args.object is not None:
         try:
             subprocess.check_output(
-                ["clang", "-fdiagnostics-color", "-o", module.output_file]
+                [
+                    "clang",
+                    "-fdiagnostics-color",
+                    "-Wl,-e,_entry",
+                    "-o",
+                    module.output_file,
+                ]
                 + module.to_link,
                 stderr=subprocess.STDOUT,
             )

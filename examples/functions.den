@@ -8,9 +8,9 @@ pub int test(int: y) => {
 }
 
 pub entry => {
-    
+
 }
 
-pub hi => {
-
+pub entry => {
+    
 }

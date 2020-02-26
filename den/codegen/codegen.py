@@ -237,14 +237,12 @@ class ModuleCodeGen:
             ],
         )
 
-        if funcname == "entry":
-            funcname = "main"
-
         if funcname in self.module.globals:
             self.logger.error(
                 errors.function_redefinition_error,
-                f"Function `{funcname}` was redefined",
-                node.position,
+                f"Function `{node.name.name}` was defined here",
+                self.module.get_global(funcname).position,
+                other=[(node.position, self.path, "And redefined here")],
             )
             self.logger.throw()
         else:
@@ -365,10 +363,10 @@ class ModuleCodeGen:
                 ):
                     self.logger.error(
                         errors.duplicate_symbol_error,
-                        f"Object `{obj.name if obj.name != 'main' else 'entry'}` is defined here",
+                        f"Object `{obj.name}` is defined here",
                         objects[obj.name].position,
                         other=[(obj.position, module, f"And is also defined here")],
-                        tip=f"Consider making `{obj.name if obj.name != 'main' else 'entry'}` private in one entry",
+                        tip=f"Consider making `{obj.name}` private in one entry",
                     )
 
     def generate(self, _ast):
