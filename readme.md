@@ -36,4 +36,4 @@ Note: code coverage right now is bad because tests are not rigorous enough; subj
 
 ## Notes
 
-* Functions are private by default, meaning they can be used in the file they are defined in, but **ONLY** in the file they are defined in.
+* Functions are private by default, meaning they can be used in the file they are defined in, but **ONLY** in the file     they are defined in.

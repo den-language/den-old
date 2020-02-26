@@ -36,3 +36,7 @@ class import_error(error):
 
 class not_implemented_error(error):
     name = __qualname__
+
+
+class duplicate_symbol_error(error):
+    name = __qualname__

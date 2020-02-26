@@ -9,16 +9,18 @@ except ImportError:
 
 
 class Error:
-    def __init__(self, error_type, message, location):
+    def __init__(self, error_type, message, location, file, other, tip):
         self.error_type = error_type
         self.message = message
         self.location = location
+        self.file = file
+        self.other = other
+        self.tip = tip
 
 
 class Logger:
     def __init__(self, filename, contents, debug=False):
-        self.file = filename
-        self.contents = contents[1:]
+        self.files = {os.path.abspath(filename): contents[1:]}
         self.debug = debug
         self.errors = []
         self.indent = "  "
@@ -34,10 +36,12 @@ class Logger:
     # def create_arrow(self, pos, prev):
     #    return " " * (len(self.indent*2) + prev + pos + 1) + "^\n"
 
-    def get_lines_string(self, location):
+    def get_lines_string(self, location, file):
+        contents = self.files[os.path.abspath(file)]
+
         lineno = location.sline  # Starts at line 1
 
-        newline_split = self.contents.split("\n")
+        newline_split = contents.split("\n")
 
         start_line = lineno - 1 if lineno == 1 else lineno - 2
         end_line = lineno if lineno > len(newline_split) else lineno + 1
@@ -66,8 +70,14 @@ class Logger:
 
         return final
 
-    def error(self, error_type, message, location):
-        self.errors.append(Error(error_type, message, location))
+    def error(self, error_type, message, location, other=[], filename=None, tip=None):
+        if filename is None:
+            filename = next(iter(self.files.keys()))
+        self.errors.append(Error(error_type, message, location, filename, other, tip))
+        for extra in other:
+            if extra[1] not in self.files:
+                with open(extra[1], "r") as f:
+                    self.files[extra[1]] = f.read()
 
     def throw(self):
         if self.errors:
@@ -75,13 +85,38 @@ class Logger:
                 f"\n{Color.RED}{Color.UNDERLINE}{Color.BOLD}{len(self.errors)} {'Errors' if len(self.errors) > 1 else 'Error'} Found:{Color.RESET}"
             )
             for error in self.errors:
-                print(
-                    f"\n{self.indent}{Color.RED}{Color.UNDERLINE}{error.error_type.name}{Color.RESET}\n"
-                )
-                print(self.get_lines_string(error.location))
-                print(f"{self.indent*2}{Color.RED}{error.message}{Color.RESET}")
-                print(
-                    f"{self.indent*2}{Color.BLUE}{os.path.relpath(self.file)}:{error.location.sline}:{find_column(self.contents, error.location.scol)-1}{Color.RESET}\n"
-                )
+                if not error.other:
+                    print(
+                        f"\n{self.indent}{Color.RED}{Color.UNDERLINE}{error.error_type.name}{Color.RESET}\n"
+                    )
+                    print(self.get_lines_string(error.location, error.file))
+                    print(f"{self.indent*2}{Color.RED}{error.message}{Color.RESET}")
+                    print(
+                        f"{self.indent*2}{Color.BLUE}{os.path.relpath(error.file)}:{error.location.sline}:{find_column(self.files[error.file], error.location.scol)-1}{Color.RESET}\n"
+                    )
+                    if error.tip:
+                        print(
+                            f"{self.indent*2}{Color.GREEN}Tip: {error.tip}{Color.RESET}"
+                        )
+                else:
+                    print(
+                        f"\n{self.indent}{Color.RED}{Color.UNDERLINE}{error.error_type.name}{Color.RESET}\n"
+                    )
+                    print(self.get_lines_string(error.location, error.file))
+                    print(f"{self.indent*2}{Color.RED}{error.message}{Color.RESET}")
+                    print(
+                        f"{self.indent*2}{Color.BLUE}{os.path.relpath(error.file)}:{error.location.sline}:{find_column(self.files[error.file], error.location.scol)-1}{Color.RESET}\n"
+                    )
+                    for other in error.other:
+                        # other = [position, file, message]
+                        print(self.get_lines_string(other[0], other[1]))
+                        print(f"{self.indent*2}{Color.RED}{other[2]}{Color.RESET}")
+                        print(
+                            f"{self.indent*2}{Color.BLUE}{os.path.relpath(other[1])}:{other[0].sline}:{find_column(self.files[other[1]], other[0].scol)-1}{Color.RESET}\n"
+                        )
+                    if error.tip:
+                        print(
+                            f"{self.indent*2}{Color.GREEN}Tip: {error.tip}{Color.RESET}\n"
+                        )
 
             quit(1)

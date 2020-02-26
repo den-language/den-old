@@ -1,6 +1,7 @@
 from llvmlite import ir
 import os
 from .generate_module import run_compile
+import copy
 
 try:
     import errors.errors as errors
@@ -37,10 +38,13 @@ class ModuleCodeGen:
             if statement.__class__.__name__ == "FunctionDefinition":
                 addr = self._codegen_function_scaff(statement)
                 self.functions.append((statement, addr))
-            else:
+        for statement in node.block.statements:
+            if statement.__class__.__name__ != "FunctionDefinition":
                 self._codegen(statement)
         for statement, addr in self.functions:
             self._codegen_FunctionDefinition(statement, addr)
+
+        # FOR AUTO MAIN GEN
         # try:
         #    self.module.get_global("main")
         # except KeyError:
@@ -245,10 +249,15 @@ class ModuleCodeGen:
             self.logger.throw()
         else:
             func = ir.Function(self.module, func_ty, funcname)
+            func.position = node.position
+            self.symtab[funcname] = func
+
+        func.linkage = "private" if not node.public else "external"
 
         return func
 
     def _codegen_FunctionDefinition(self, node, func):
+        old_symtab = copy.deepcopy(self.symtab)
         self.symtab = {}
         func.linkage = "private" if not node.public else "external"
 
@@ -279,6 +288,8 @@ class ModuleCodeGen:
 
         else:
             self._codegen_Return(dast.functions.Return(node.block, Location(0, 0)))
+
+        self.symtab = old_symtab
 
         return func
 
@@ -342,10 +353,29 @@ class ModuleCodeGen:
         if node.name == "int":
             return ir.IntType(32)
 
+    def validate_code(self):
+        objects = copy.deepcopy(self.symtab)
+        for module in self.modules.keys():
+            for obj in self.modules[module].module.module.global_values:
+                if obj.name not in objects:
+                    objects[obj.name] = obj
+                elif (
+                    obj.linkage == "external"
+                    and objects[obj.name].linkage == "external"
+                ):
+                    self.logger.error(
+                        errors.duplicate_symbol_error,
+                        f"Object `{obj.name if obj.name != 'main' else 'entry'}` is defined here",
+                        objects[obj.name].position,
+                        other=[(obj.position, module, f"And is also defined here")],
+                        tip=f"Consider making `{obj.name if obj.name != 'main' else 'entry'}` private in one entry",
+                    )
+
     def generate(self, _ast):
         self.ast = _ast
         self.module = ir.Module(name=self.ast.name)
         self.generate_code(self.ast)
+        self.validate_code()
 
         self.logger.log(f"Codegen: Generated LLVM IR: \n{self.module}")
 

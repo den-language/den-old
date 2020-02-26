@@ -1,10 +1,16 @@
-int func1(int: z) => {
-    ret z;
-}
+int func1(int: z) => z;
 
-int func2(int: z) => z;
+int func2(int: z, int: y) => z+y;
 
 pub int test(int: y) => {
-    int: x = func1(func2(y));
+    int: x = func2(func1(10), 10);
     ret x;
+}
+
+pub entry => {
+    
+}
+
+pub hi => {
+
 }
