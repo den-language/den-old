@@ -86,10 +86,13 @@ class ModuleCodeGen:
     @staticmethod
     def _codegen_Integer(node):
         return ir.Constant(ir.IntType(32), int(node.value))
-    
+
     @staticmethod
     def _codegen_String(node):
-        return ir.Constant(ir.ArrayType(ir.IntType(4), len(str(node.value))), [ord(char) for char in node.value])
+        return ir.Constant(
+            ir.ArrayType(ir.IntType(4), len(str(node.value))),
+            [ord(char) for char in node.value],
+        )
 
     def _codegen_Neg(self, node):
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
