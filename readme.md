@@ -18,6 +18,8 @@ int add(int: x, int: y) => x+y;  # Define add function
 int mul(int: x, int: y) => x*y;  # Define mul function
 ```
 
+**NOTE: Den will most likely be rewritten in a language that has better support for LLVM soon.**
+
 [Changelog](./changelog.md)&nbsp;&nbsp;[Codacy](https://www.codacy.com/manual/MonliH/den)&nbsp;&nbsp;[Trello](https://trello.com/b/gqVgP9Yf/the-den-programming-language)
 
 ## Run
