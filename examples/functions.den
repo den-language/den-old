@@ -8,9 +8,5 @@ pub int test(int: y) => {
 }
 
 pub entry => {
-
-}
-
-pub entry => {
-    
+    str: x = "hello!";
 }

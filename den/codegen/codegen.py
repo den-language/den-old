@@ -79,8 +79,17 @@ class ModuleCodeGen:
     # Expressions
 
     @staticmethod
+    def _codegen_Type(node):
+        if node.name == "int":
+            return ir.IntType(32)
+
+    @staticmethod
     def _codegen_Integer(node):
         return ir.Constant(ir.IntType(32), int(node.value))
+    
+    @staticmethod
+    def _codegen_String(node):
+        return ir.Constant(ir.ArrayType(ir.IntType(4), len(str(node.value))), [ord(char) for char in node.value])
 
     def _codegen_Neg(self, node):
         return self.builder.neg(self._codegen(node.value), name="tmpneg")
@@ -240,7 +249,7 @@ class ModuleCodeGen:
         if funcname in self.module.globals:
             self.logger.error(
                 errors.function_redefinition_error,
-                f"Function `{node.name.name}` was defined here",
+                f"Function `{funcname}` was defined here",
                 self.module.get_global(funcname).position,
                 other=[(node.position, self.path, "And redefined here")],
             )
@@ -345,11 +354,6 @@ class ModuleCodeGen:
 
         self.builder.position_at_end(saved_block)
         self.builder.store(init_val, var_addr)
-
-    @staticmethod
-    def _codegen_Type(node):
-        if node.name == "int":
-            return ir.IntType(32)
 
     def validate_code(self):
         objects = copy.deepcopy(self.symtab)

@@ -362,6 +362,10 @@ class DenParser(Parser):
     @_("function_call")
     def expr(self, p):
         return p.function_call
+    
+    @_("string")
+    def expr(self, p):
+        return p.string
 
     # Sub expressions
 
@@ -387,6 +391,10 @@ class DenParser(Parser):
     @_("INT")
     def integer(self, p):
         return ast.primitives.Integer(p.INT, Location(p.lineno, p.index))
+    
+    @_("STRING")
+    def string(self, p):
+        return ast.primitives.String(p.STRING, Location(p.lineno, p.index))
 
     @_("expr ',' expr")
     def items(self, p):

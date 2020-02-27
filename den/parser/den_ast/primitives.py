@@ -26,7 +26,7 @@ class primitives:
                 value (str): Value of string.
                 position (Location): Position of string.
             """
-            self.value = value
+            self.value = value[1:-1]
             self.position = position
 
     class Type(Node):

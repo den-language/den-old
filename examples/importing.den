@@ -3,6 +3,7 @@ import functions.test;
 # import object_vehicle.airplane.Plane;
 
 pub entry => {
+    str: x = "hi";
     test(10); # test is a function in the functions.den file
     # toyota = car.Car("Corolla", "Toyota", 5, "AWD W3S");
     # toyota.print_info();
